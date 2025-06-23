@@ -1,0 +1,208 @@
+Plan de Pruebas
+Introducción
+Este documento describe el plan  de pruebas al que se someterá ….. El alcance del plan será ....
+
+El proyecto será probado funcionalmente al nivel de …..
+Elementos incluidos en la pruebas
+La siguiente es una lista de los elementos a ser testeados:
+-
+Funcionalidades a ser probadas
+La siguiente es una lista de las funcionalidades que serán testeadas en cada subsistema y cuales son los casos de prueba que definen como hacerlo:
+
+Subsistema
+Funcionalidad
+Casos de Prueba
+Objetivo
+Id
+CU0001
+
+
+Registrar al usuario
+Lograr un registro completo del usuario
+1.1
+Comprobar que se requieran los campos obligatorios
+1.2
+Comprobar que se registre de manera correcta un usuario con caracteres especiales
+1.3
+Comprobar que se impida registrar dos veces al mismo usuario.
+1.4
+CU0002
+Iniciar sesión en el sistema
+Lograr un inicio de sesión correcto con credenciales válidas
+2.1
+
+
+
+
+Comprobar el mensaje de error al ingresar credenciales inválidas
+2.2
+CU0003
+Buscar usuarios
+Lograr una búsqueda de usuarios exitosa por nombre
+3.1
+Lograr una búsqueda de usuarios exitosa por apellido
+3.2
+Comprobar que no se encuentren usuarios con criterios de búsqueda inexistentes
+3.3
+CU0004
+Enviar solicitudes de amistad
+Lograr el envío de solicitudes de amistad a usuarios existentes
+4.1
+Comprobar que no se pueda enviar solicitudes a usuarios ya agregados como amigos
+4.2
+Comprobar que no se pueda enviar solicitudes a usuarios bloqueados
+4.3
+CU0005
+Aceptar/Rechazar solicitudes de amistad
+Lograr la aceptación de solicitudes de amistad
+5.1
+Lograr el rechazo de solicitudes de amistad
+5.2
+Comprobar que las solicitudes aceptadas se reflejen correctamente en la lista de amigos
+5.3
+CU0006
+Eliminar amigos
+Lograr la eliminación de amigos de la lista de amigos
+6.1
+Comprobar que el amigo eliminado ya no aparezca en la lista de amigos
+6.2
+CU0007
+
+
+Crear grupo amigos
+Lograr la creación del grupo
+7.1
+Comprobar nombre del grupo
+7.2
+Asociar a los usuarios el grupo
+7.3
+CU0008
+Agregar amigo a grupo
+Lograr la correcta agregación del amigo
+8.1
+Comprobar la agregregación al grupo
+8.2
+CU0009
+Asignar permisos por grupo
+Lograr la correcta asignación de permisos al grupo
+9.1
+CU0010
+Crear álbum
+Lograr una correcta creación del álbum
+10.1
+Verificar validez del nombre del álbum
+10.2
+CU0011
+Subir fotos al álbum
+Lograr subir la foto correctamente al álbum
+11.1
+Verificar que el tamaño de la foto sea el correcto
+11.2
+Verificar que la foto que se quiere subir no existe en el álbum
+11.3
+CU0012
+Eliminar foto del álbum
+Lograr la correcta eliminación de la foto seleccionada del álbum
+12.1
+Manejar la cancelación de eliminación de foto
+12.2
+Manejar errores que pueden pasar en el intento de eliminar
+12.3
+CU0013
+Agregar comentario a una foto
+Lograr que un usuario autorizado comente correctamente en una foto
+13.1
+Validar que el sistema gestione correctamente entradas no válidas
+13.2
+CU0014
+Eliminar comentario de amigo en foto propia
+Permitir al dueño de una foto eliminar comentarios de terceros
+14.1
+Validar cancelación sin acciones involuntarias
+14.2
+CU0015
+Modificar o eliminar comentarios propios
+Permitir al autor del comentario modificar o eliminarlo
+15.1
+Validar cancelación sin acciones
+	15.2
+CU0016
+Publicar en el muro
+Permitir a usuarios autorizados publicar en el muro de un amigo
+16.1
+Ocultar o deshabilitar opción de publicación
+16.2
+CU0017
+Eliminar comentario del muro propio
+Permitir al dueño del muro gestionar comentarios de otros usuarios
+17.1
+Validar que no se realice la acción si se cancela
+17.2
+CU0018
+Configurar recordatorio cumpleaños
+Lograr configurar recordatorio cumpleaños
+18.1
+Comprobar que se requieran los campos obligatorios
+18.2
+Comprobar configuración exitosa
+18.3
+CU0019
+Ver notificación en la página principal
+Comprobar que haya notificaciones
+19.1
+Comprobar que se muestre en la página principal
+19.2
+CU0020
+Actualizar perfil
+Comprobar que se haya realizado un cambio en algún campo
+20.1
+Verificar cambios en algún campo
+20.2
+CU0021
+Deshabilitar usuario
+Lograr seleccionar usuario para deshabilitar
+21.1
+Confirmar  usuario deshabilitado
+21.2
+Verificar usuario deshabilitado
+21.3
+CU0022
+Eliminar comentario impropio
+Lograr seleccionar comentario impropio
+22.1
+Confirmar comentario eliminado
+22.2
+Validar eliminación de comentario impropio
+22.3
+
+
+
+
+Estrategias de Prueba
+Niveles de Prueba
+Las pruebas para este proyecto se realizarán a nivel de Integración/Sistema y de Aceptación.
+
+Las pruebas de Integración/Sistema serán realizadas ….
+Las pruebas de Aceptación serán realizadas....
+
+
+Herramientas de Prueba
+	A continuación  se detallan las herramientas utilizadas para realizar las pruebas
+
+
+Criterios de Éxito
+El proceso de prueba se completará una vez aplicados todos los casos de pruebas definidos y resuelto todos los errores importantes (blocker, critical y major ) descubiertos durante el proceso
+Entregables
+La siguiente es una lista de los entregables generados durante el proceso de pruebas:
+Reportes de defectos e incidencias
+
+Ambiente de prueba necesario
+Los siguientes elementos son necesarios para poder llevar adelante el proceso de prueba:
+Windows 7 con Google Chrome 22 instalado
+MAC con Google Chrome 22 instalado
+Linux Ubuntu 12.04 con Google Chrome 22 instalado
+
+
+
+
+

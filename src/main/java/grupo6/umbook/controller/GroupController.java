@@ -1,0 +1,191 @@
+package grupo6.umbook.controller;
+
+import grupo6.umbook.model.Group;
+import grupo6.umbook.model.User;
+import grupo6.umbook.service.GroupService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+@RestController
+@RequestMapping("/api/groups")
+public class GroupController {
+
+    private final GroupService groupService;
+
+    @Autowired
+    public GroupController(GroupService groupService) {
+        this.groupService = groupService;
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createGroup(@RequestBody Map<String, Object> request) {
+        try {
+            String name = (String) request.get("name");
+            String description = (String) request.get("description");
+            Long creatorId = Long.valueOf(request.get("creatorId").toString());
+
+            if (name == null || creatorId == null) {
+                Map<String, String> response = new HashMap<>();
+                response.put("error", "Name and creator ID are required");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+            Group group = groupService.createGroup(name, description, creatorId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(group);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @GetMapping("/{groupId}")
+    public ResponseEntity<?> getGroupById(@PathVariable Long groupId) {
+        try {
+            Group group = groupService.findById(groupId);
+            return ResponseEntity.ok(group);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+    @GetMapping("/creator/{creatorId}")
+    public ResponseEntity<List<Group>> getGroupsByCreator(@PathVariable Long creatorId) {
+        List<Group> groups = groupService.findByCreator(creatorId);
+        return ResponseEntity.ok(groups);
+    }
+
+    @GetMapping("/member/{userId}")
+    public ResponseEntity<List<Group>> getGroupsByMember(@PathVariable Long userId) {
+        List<Group> groups = groupService.findGroupsByMember(userId);
+        return ResponseEntity.ok(groups);
+    }
+
+    @GetMapping("/public")
+    public ResponseEntity<List<Group>> getPublicGroups() {
+        List<Group> groups = groupService.findPublicGroups();
+        return ResponseEntity.ok(groups);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Group>> searchGroups(@RequestParam String term) {
+        List<Group> groups = groupService.searchGroups(term);
+        return ResponseEntity.ok(groups);
+    }
+
+    @PutMapping("/{groupId}")
+    public ResponseEntity<?> updateGroup(
+            @PathVariable Long groupId,
+            @RequestBody Map<String, Object> request) {
+        try {
+            String name = (String) request.get("name");
+            String description = (String) request.get("description");
+            Long userId = Long.valueOf(request.get("userId").toString());
+
+            Group group = groupService.updateGroup(groupId, name, description, userId);
+            return ResponseEntity.ok(group);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @PostMapping("/{groupId}/members")
+    public ResponseEntity<?> addMemberToGroup(
+            @PathVariable Long groupId,
+            @RequestBody Map<String, Long> request) {
+        try {
+            Long userId = request.get("userId");
+            Long inviterId = request.get("inviterId");
+
+            if (userId == null || inviterId == null) {
+                Map<String, String> response = new HashMap<>();
+                response.put("error", "User ID and inviter ID are required");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+
+            Group group = groupService.addMemberToGroup(groupId, userId, inviterId);
+            return ResponseEntity.ok(group);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @DeleteMapping("/{groupId}/members/{userId}")
+    public ResponseEntity<?> removeMemberFromGroup(
+            @PathVariable Long groupId,
+            @PathVariable Long userId,
+            @RequestParam Long removerId) {
+        try {
+            Group group = groupService.removeMemberFromGroup(groupId, userId, removerId);
+            return ResponseEntity.ok(group);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @PutMapping("/{groupId}/permissions")
+    public ResponseEntity<?> setGroupPermissions(
+            @PathVariable Long groupId,
+            @RequestBody Map<String, Object> request) {
+        try {
+            Long userId = Long.valueOf(request.get("userId").toString());
+            Group.GroupVisibility visibility = request.get("visibility") != null ?
+                    Group.GroupVisibility.valueOf((String) request.get("visibility")) : null;
+            Group.GroupPermission postPermission = request.get("postPermission") != null ?
+                    Group.GroupPermission.valueOf((String) request.get("postPermission")) : null;
+            Group.GroupPermission commentPermission = request.get("commentPermission") != null ?
+                    Group.GroupPermission.valueOf((String) request.get("commentPermission")) : null;
+            Group.GroupPermission invitePermission = request.get("invitePermission") != null ?
+                    Group.GroupPermission.valueOf((String) request.get("invitePermission")) : null;
+
+            Group group = groupService.setGroupPermissions(
+                    groupId, userId, visibility, postPermission, commentPermission, invitePermission);
+            return ResponseEntity.ok(group);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @GetMapping("/{groupId}/members")
+    public ResponseEntity<Set<User>> getGroupMembers(@PathVariable Long groupId) {
+        try {
+            Set<User> members = groupService.getGroupMembers(groupId);
+            // Remove passwords from the response
+            members.forEach(member -> member.setPassword(null));
+            return ResponseEntity.ok(members);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    @GetMapping("/{groupId}/is-member/{userId}")
+    public ResponseEntity<Map<String, Boolean>> isUserMemberOfGroup(
+            @PathVariable Long groupId,
+            @PathVariable Long userId) {
+        try {
+            boolean isMember = groupService.isUserMemberOfGroup(groupId, userId);
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("isMember", isMember);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+}

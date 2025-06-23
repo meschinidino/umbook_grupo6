@@ -1,0 +1,179 @@
+Casos de Prueba
+
+
+CU001 Registrarse en el sistema
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Lograr un registro exitoso	No existen usuarios en el sistema	"Usuario: pgomez
+Clave: jhklejdnWED23
+Nombre: Pablo
+Apellido: Gomez
+Email: pgomez@gmail.com"	El sistema crea el usuario y muestra la pantalla de bienvenida
+CP 02	Impedir que un usuario se registre con el mismo email	Se ha ejecutado con éxito el CP 01	"Usuario: pepe
+Clave: jhklejdnWED23
+Nombre: Pedro
+Apellido: Gomez
+Email: pgomez@gmail.com"	El sistema muestra un error indicando que el correo está duplicado.
+
+CU002: Iniciar Sesión
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP01	Inicio de sesión exitoso con credenciales válidas	El usuario existe y tiene una cuenta	Usuario: pgomez Clave: jhklejdnWED23	El sistema permite el acceso y muestra el panel de usuario.
+CP02	Inicio de sesión fallido con contraseña incorrecta	El usuario existe y tiene una cuenta	Usuario: pgomez Clave: claveIncorrecta	El sistema muestra un mensaje de error de "contraseña incorrecta".
+CP03	Intento de inicio de sesión con usuario inexistente	No existe el usuario en el sistema	Usuario: usuarioInexistente Clave: CualquierClave	El sistema muestra un mensaje de error de "usuario no encontrado".
+
+CU003: Buscar Usuario
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP01	Búsqueda exitosa de usuarios por nombre	Existen al menos 3 usuarios en el sistema	Término de búsqueda: Gomez	El sistema muestra una lista de usuarios cuyo nombre o apellido contiene "Gomez".
+CP02	Búsqueda sin resultados	Existen al menos 3 usuarios en el sistema	Término de búsqueda: NombreInexistente	El sistema muestra un mensaje indicando que no se encontraron resultados.
+CP03	Búsqueda con término vacío	Existen al menos 3 usuarios en el sistema	Término de búsqueda: ""	El sistema muestra todos los usuarios.
+
+CU004: Enviar solicitud de amistad
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP01	Solicitud de amistad enviada exitosamente	Dos usuarios existen en el sistema	Usuario solicitante: pgomez Usuario objetivo: pepe	El sistema envía una solicitud de amistad a pepe.
+CP02	Intento de enviar solicitud a usuario ya amigo	Los usuarios ya son amigos	Usuario solicitante: pgomez Usuario objetivo: pepe	El sistema muestra un mensaje indicando que ya son amigos.
+CP03	Intento de enviar solicitud a uno mismo	Un usuario existe en el sistema	Usuario solicitante: pgomez Usuario objetivo: pgomez	El sistema muestra un error indicando que no se puede agregar a uno mismo.
+
+CU005: Aceptar o Rechazar solicitud de amistad
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP01	Aceptar una solicitud de amistad	El usuario tiene una solicitud pendiente	Usuario: pepe Aceptar solicitud de: pgomez	El sistema agrega a pgomez como amigo de pepe.
+CP02	Rechazar una solicitud de amistad	El usuario tiene una solicitud pendiente	Usuario: pepe Rechazar solicitud de: pgomez	El sistema elimina la solicitud y no agrega a pgomez como amigo.
+CP03	Intentar aceptar una solicitud inexistente	El usuario no tiene solicitudes pendientes	Usuario: pepe Aceptar solicitud de: pgomez	El sistema muestra un mensaje indicando que no hay solicitudes pendientes de ese usuario.
+
+CU006: Eliminar amigo
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP01	Eliminar a un usuario de la lista de amigos	Los usuarios son amigos	Usuario: pepe Eliminar amigo: pgomez	El sistema elimina a pgomez de la lista de amigos de pepe.
+CP02	Intentar eliminar a un usuario que no es amigo	Los usuarios no son amigos	Usuario: pepe Eliminar amigo: otroUsuario	El sistema muestra un mensaje indicando que no son amigos.
+CP03	Intentar eliminar con la lista de amigos vacía	El usuario tiene la lista de amigos vacía	Usuario: pepe Eliminar amigo: pgomez	El sistema muestra un mensaje indicando que no hay amigos para eliminar.
+
+
+CU007 Crear grupo
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Lograr un creación exitosa	No existen el grupo en el sistema	"Nombre: La tabla feliz
+Descripción:.....
+"	El sistema crea el grupo y muestra la pantalla del grupo
+CP 02	Impedir que un usuario cree un grupo sin nombre o con nombre ya existente	Se ha ejecutado con éxito el CP 01	"Nombre: La tabla feliz
+Descripción:.....
+"	"El sistema muestra un error:  ""El nombre del grupo no puede estar vacío ni repetirse. Por favor, ingrese un nombre válido.""
+"
+
+
+CU008 Asignar amigo a grupo
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Lograr una agregación exitosa del amigo al grupo	El amigo no está en el grupo	Nombre y apellido: Fabiana Fernandez	El sistema agrega al amigo seleccionado al grupo
+CP 02	Impedir que un usuario quiera continuar sin agregar a algún amigo	Se ha ejecutado con éxito el CP 01	Nombre y apellido: 	El sistema muestra un error:  "Debe seleccionar al menos un amigo para agregar al grupo."
+
+
+CU0009: Asignar permisos por grupo
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Lograr una asignación exitosa de permisos por grupo	El grupo no tiene ningún permiso asignado	"Visibilidad de grupo: Publico
+Acceso a las publicaciones: Todos
+Comentar: Todos
+Invitar a otros: Todos
+Postear: Todos"	El sistema guarda los permisos
+CP 02	Manejar grupo sin permisos	Se ha ejecutado con éxito el CP 01	"Visibilidad de grupo:
+Acceso a las publicaciones:
+Comentar:
+Invitar a otros:
+Postear:"	El sistema muestra un mensaje de error: "Debe seleccionar al menos un permiso para el grupo"
+
+
+CU0010: Crear álbum
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Lograr una creación exitosa del álbum	No existe el álbum	"Nombre del álbum: Mascotas
+Descripción: ..."	El sistema crea el álbum y lo muestra en pantalla
+CP 02	Impedir que un usuario cree un álbum sin nombre o con nombre ya existente	Se ha ejecutado con éxito el CP 01	"Nombre del álbum:
+Descripción: ..."	El sistema muestra un mensaje de error: "El nombre del álbum no puede estar vacío ni repetirse. Ingrese un nombre válido”
+
+CU0011: Subir fotos al álbum
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Lograr que la foto se suba correctamente	No existe la foto en el álbum	foto	El sistema sube la foto y la muestra en el álbum
+CP 02	Impedir que un usuario suba una foto en un formato o tamaño incorrecto	Se ha ejecutado con éxito el CP 01	foto más grande del tamaño permitido	El sistema muestra un mensaje de error: "Formato o tamaño inválido. Asegúrese de que cada foto sea JPG, PNG o GIF y no supere los 5MB."
+CP 03	Impedir que un usuario suba una foto que ya existe en el album	Se ha ejecutado con éxito el CP 01	foto ya existente en el album	El sistema muestra un mensaje de error: "Foto ya existente en el album."
+
+
+CU0012: Eliminar foto del álbum
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Lograr una correcta eliminación de la foto	Existe la foto en el álbum	foto existente	El sistema elimina la foto y ya no se muestra en el álbum
+CP 02	Manejar la cancelación de la eliminación de la foto	Se ha ejecutado con éxito el CP 01	foto existente	El sistema sigue mostrando la foto que se canceló la eliminación
+CP 03	Manejar error de eliminación	Se ha ejecutado con éxito el CP 01	foto existente	El sistema muestra un mensaje de error:"Error al eliminar la foto. Verifique los permisos o vuelva a intentar más tarde."
+
+
+CU0013: Agregar comentario a una foto
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Agregar un comentario exitoso	Usuario autenticado con permisos	Foto visible, comentario válido	Comentario agregado y visible en la foto
+CP 02	Manejar comentario vacío o inválido	Usuario autenticado con permisos	Foto visible, comentario vacío o inválido	Sistema muestra mensaje de error, sin agregar el comentario
+
+
+CU0014: Eliminar comentario de amigo en foto propia
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Eliminar comentario exitoso	Propietario de la foto visualiza comentarios	Selecciona comentario	Comentario eliminado
+CP 02	Cancelar eliminación	Propietario de la foto visualiza comentarios	Selecciona comentario y cancela	Sistema no realiza ninguna acción
+
+
+CU0015: Modificar o eliminar comentarios propios
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Modificar o eliminar exitoso	Usuario autenticado, autor del comentario	Selecciona comentario propio	Comentario modificado o eliminado
+CP 02	Cancelar acción	Usuario autenticado, autor del comentario	Selecciona comentario y cancela	Sistema no realiza ninguna acción
+
+
+CU0016: Publicar en el muro
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Publicar mensaje exitoso	Usuario autorizado accede al muro de un amigo	Escribe mensaje (≤ 500 caracteres)	Mensaje publicado en el muro
+CP 02	Sin permisos para publicar	Usuario no autorizado accede al muro de un amigo	Intenta publicar mensaje	Sistema oculta o deshabilita la funcionalidad
+
+
+CU0017: Eliminar comentario del muro propio
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Eliminar comentario exitoso	Usuario autenticado, dueño del muro	Selecciona comentario	Comentario eliminado
+CP 02	Cancelar eliminación	Usuario autenticado, dueño del muro	Selecciona comentario y cancela	Sistema no realiza ninguna acción
+
+
+CU0018: Configurar recordatorio cumpleaños
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Configurar recordatorio	Usuario autenticado	Cantidad de dias de anticipación	Recordatorio programado
+CP 02	Cancelar configuración 	Usuario autenticado	Ningun dato	Sistema no realiza ninguna acción
+
+
+CU0019: Ver notificación en la pagina principal
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Ver notificación en la pagina principal	Usuario autenticado	Notificación existente	Notificaciones en la pagina principal
+CP 02	Ver mensaje no hay notificaciones	Usuario autenticado	DUDA	Mensaje "no hay notificaciones"
+
+
+CU0020: Actualizar perfil
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Actualizar perfil	Usuario autenticado	Seleccionar cantidad de dias previos al cumpleaños	Recordatorio programado
+CP 02				Sistema no realiza ninguna acción
+
+
+CU0021: Deshabilitar usuario
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Deshabilitar usuario	Administrador autenticado	Nombre del usuario a deshabilitar	Usuario deshabilitado
+CP 02	Cancelar deshabilitación 	Administrador autenticado	Nombre del usuario a cancelar deshabilitación	Sistema no realiza ninguna acción
+
+
+CU0022: Eliminar comentario impropio
+
+Id	Objetivo	Estado Inicial	Datos de Prueba	Resultado Esperado
+CP 01	Eliminar comentario impropio	Administrador autenticado, comentario impropio en alguna publicación	Comentario impropio	Comentario eliminado, con mensaje de remplazo
+CP 02	Cancelar eliminación de comentario	Administrador autenticado, comentario impropio en alguna publicación	Comentario impropio cuestionable	Cancelar eliminación del comentario
