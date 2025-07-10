@@ -34,7 +34,7 @@ public class AuthController {
     @PostMapping("/register")
     public String registerUser(@ModelAttribute User user, RedirectAttributes redirectAttributes) {
         // Verificar si el usuario ya existe
-        if (userRepository.findByEmail(user.getEmail()) != null) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             redirectAttributes.addFlashAttribute("errorMessage", "¡El correo electrónico ya está registrado!");
             return "redirect:/register";
         }
@@ -45,5 +45,10 @@ public class AuthController {
 
         redirectAttributes.addFlashAttribute("successMessage", "¡Registro exitoso! Por favor, inicia sesión.");
         return "redirect:/login";
+    }
+
+    @GetMapping("/home")
+    public String showHomePage() {
+        return "home"; // Esto buscará y devolverá el archivo home.html
     }
 }

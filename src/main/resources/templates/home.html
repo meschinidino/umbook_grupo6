@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - UMbook</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="home-body">
+
+<div class="home-container">
+    <aside class="sidebar-left">
+        <h1 class="home-logo">UMbook</h1>
+        <nav class="main-nav">
+            <ul>
+                <li class="active"><a href="#"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="#"><i class="fas fa-envelope"></i> Messages</a></li>
+                <li><a href="#"><i class="fas fa-bookmark"></i> Albums</a></li>
+                <li><a href="#"><i class="fas fa-list-ul"></i> Lists</a></li>
+                <li><a href="#"><i class="fas fa-users"></i> Groups</a></li>
+                <li><a href="#"><i class="fas fa-user-check"></i> Subscriptions</a></li>
+                <li><a href="#"><i class="fas fa-credit-card"></i> Add Card</a></li>
+                <li><a href="#"><i class="fas fa-user"></i> My Profile</a></li>
+            </ul>
+        </nav>
+        <button class="btn-new-post">New Post</button>
+    </aside>
+
+    <main class="feed">
+        <article class="post">
+            <header class="post-header">
+                <img src="https://i.pravatar.cc/50?img=1" alt="Avatar" class="avatar">
+                <div class="user-info">
+                    <strong>Jessica Alba</strong>
+                    <span>@jessicaalba</span>
+                </div>
+                <i class="fas fa-ellipsis-h post-options"></i>
+            </header>
+            <div class="post-content">
+                <img src="https://images.unsplash.com/photo-1574655291882-7f51c745262f?q=80&w=1887" alt="Post image" class="post-image">
+            </div>
+            <footer class="post-actions">
+                <a href="#"><i class="far fa-heart"></i> 122</a>
+                <a href="#"><i class="far fa-comment"></i> 15</a>
+                <a href="#"><i class="far fa-share-square"></i> Share</a>
+                <a href="#" class="bookmark-icon"><i class="far fa-bookmark"></i></a>
+            </footer>
+        </article>
+
+        <article class="post">
+            <header class="post-header">
+                <img src="https://i.pravatar.cc/50?img=2" alt="Avatar" class="avatar">
+                <div class="user-info">
+                    <strong>John Doe</strong>
+                    <span>@johndoe</span>
+                </div>
+                <i class="fas fa-ellipsis-h post-options"></i>
+            </header>
+            <div class="post-content">
+                <p>Follow your dreams. They know the way. ✨</p>
+                <img src="https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?q=80&w=1887" alt="Post image" class="post-image">
+            </div>
+            <footer class="post-actions">
+                <a href="#"><i class="far fa-heart"></i> 250</a>
+                <a href="#"><i class="far fa-comment"></i> 45</a>
+                <a href="#"><i class="far fa-share-square"></i> Share</a>
+                <a href="#" class="bookmark-icon"><i class="far fa-bookmark"></i></a>
+            </footer>
+        </article>
+    </main>
+
+    <aside class="sidebar-right">
+        <div class="top-bar">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search">
+            </div>
+            <i class="fas fa-bell notification-bell"></i>
+        </div>
+        
+
+</body>
+</html>

@@ -29,6 +29,7 @@ public class SecurityConfig {
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login") // Página de login personalizada
+                        .defaultSuccessUrl("/home", true) // <-- AGREGA ESTA LÍNEA
                         .permitAll()
                 )
                 .logout(logout -> logout.permitAll());
