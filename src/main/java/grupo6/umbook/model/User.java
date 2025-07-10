@@ -13,24 +13,27 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String username;
-
-    @Column(nullable = false)
-    private String password;
-
     @Column(nullable = false)
     private String firstName;
 
     @Column(nullable = false)
     private String lastName;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-
     private LocalDate birthDate;
 
+    private String gender;
+
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    private String phone;
+
+    @Column(nullable = false)
+    private String password;
+
     private boolean enabled = true;
+
+    private Integer birthdayReminderDays;
 
     @ManyToMany
     @JoinTable(
@@ -46,18 +49,17 @@ public class User {
     @OneToMany(mappedBy = "sender")
     private Set<FriendRequest> sentFriendRequests = new HashSet<>();
 
-    private Integer birthdayReminderDays;
-
     // Constructors
-    public User() {
-    }
+    public User() {}
 
-    public User(String username, String password, String firstName, String lastName, String email) {
-        this.username = username;
-        this.password = password;
+    public User(String firstName, String lastName, LocalDate birthDate, String gender, String email, String phone, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.birthDate = birthDate;
+        this.gender = gender;
         this.email = email;
+        this.phone = phone;
+        this.password = password;
     }
 
     // Getters and Setters
@@ -67,22 +69,6 @@ public class User {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getFirstName() {
@@ -101,14 +87,6 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public LocalDate getBirthDate() {
         return birthDate;
     }
@@ -117,12 +95,52 @@ public class User {
         this.birthDate = birthDate;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Integer getBirthdayReminderDays() {
+        return birthdayReminderDays;
+    }
+
+    public void setBirthdayReminderDays(Integer birthdayReminderDays) {
+        this.birthdayReminderDays = birthdayReminderDays;
     }
 
     public Set<User> getFriends() {
@@ -149,14 +167,6 @@ public class User {
         this.sentFriendRequests = sentFriendRequests;
     }
 
-    public Integer getBirthdayReminderDays() {
-        return birthdayReminderDays;
-    }
-
-    public void setBirthdayReminderDays(Integer birthdayReminderDays) {
-        this.birthdayReminderDays = birthdayReminderDays;
-    }
-
     // Helper methods
     public void addFriend(User friend) {
         this.friends.add(friend);
@@ -171,8 +181,7 @@ public class User {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
+        if (!(o instanceof User user)) return false;
         return id != null && id.equals(user.id);
     }
 

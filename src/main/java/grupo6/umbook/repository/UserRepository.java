@@ -13,11 +13,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByUsername(String username);
-
     Optional<User> findByEmail(String email);
-
-    boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);
 
@@ -27,9 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.enabled = true AND u.birthDate IS NOT NULL AND FUNCTION('MONTH', u.birthDate) = FUNCTION('MONTH', :date) AND FUNCTION('DAY', u.birthDate) = FUNCTION('DAY', :date)")
     List<User> findUsersWithBirthdayOn(@Param("date") LocalDate date);
 
-    // Custom implementation to find users with birthdays in the next N days
-    // This avoids complex JPQL functions that might not be compatible across different databases
     List<User> findByEnabledTrueAndBirthDateIsNotNull();
 
-    // The actual filtering for birthdays in next days will be done in the service layer
+    // La lógica para filtrar cumpleaños en los próximos n días se recomienda implementarla en el servicio.
 }
