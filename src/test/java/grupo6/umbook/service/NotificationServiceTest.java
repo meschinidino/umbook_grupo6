@@ -39,7 +39,6 @@ class NotificationServiceTest {
         // Set up test user
         testUser = new User();
         testUser.setId(1L);
-        testUser.setUsername("pgomez");
         testUser.setFirstName("Pablo");
         testUser.setLastName("Gomez");
         testUser.setEmail("pgomez@gmail.com");

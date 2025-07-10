@@ -8,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,7 +32,6 @@ class UserServiceTest {
 
         testUser = new User();
         testUser.setId(1L);
-        testUser.setUsername("pgomez");
         testUser.setPassword("jhklejdnWED23");
         testUser.setFirstName("Pablo");
         testUser.setLastName("Gomez");
@@ -41,7 +42,6 @@ class UserServiceTest {
     @Test
     void registerUser_Success() {
         // Arrange
-        when(userRepository.existsByUsername(anyString())).thenReturn(false);
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(testUser);
 
@@ -50,29 +50,13 @@ class UserServiceTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(testUser.getUsername(), result.getUsername());
         assertEquals(testUser.getEmail(), result.getEmail());
         verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
-    void registerUser_DuplicateUsername() {
-        // Arrange
-        when(userRepository.existsByUsername(anyString())).thenReturn(true);
-
-        // Act & Assert
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            userService.registerUser(testUser);
-        });
-
-        assertEquals("Username already exists", exception.getMessage());
-        verify(userRepository, never()).save(any(User.class));
-    }
-
-    @Test
     void registerUser_DuplicateEmail() {
         // Arrange
-        when(userRepository.existsByUsername(anyString())).thenReturn(false);
         when(userRepository.existsByEmail(anyString())).thenReturn(true);
 
         // Act & Assert
@@ -87,10 +71,10 @@ class UserServiceTest {
     @Test
     void authenticate_Success() {
         // Arrange
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(testUser));
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(testUser));
 
         // Act
-        boolean result = userService.authenticate("pgomez", "jhklejdnWED23");
+        boolean result = userService.authenticate("pgomez@gmail.com", "jhklejdnWED23");
 
         // Assert
         assertTrue(result);
@@ -99,7 +83,7 @@ class UserServiceTest {
     @Test
     void authenticate_WrongPassword() {
         // Arrange
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(testUser));
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(testUser));
 
         // Act
         boolean result = userService.authenticate("pgomez", "wrongPassword");
@@ -111,7 +95,7 @@ class UserServiceTest {
     @Test
     void authenticate_UserNotFound() {
         // Arrange
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         // Act
         boolean result = userService.authenticate("nonexistentUser", "anyPassword");
@@ -124,26 +108,45 @@ class UserServiceTest {
     void authenticate_DisabledUser() {
         // Arrange
         testUser.setEnabled(false);
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(testUser));
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(testUser));
 
         // Act
-        boolean result = userService.authenticate("pgomez", "jhklejdnWED23");
+        boolean result = userService.authenticate("pgomez@gmail.com", "jhklejdnWED23");
 
         // Assert
         assertFalse(result);
     }
 
     @Test
-    void findByUsername_Success() {
-        // Arrange
-        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(testUser));
+    void findByFirstName_Success() {
+        // Arrange: Preparamos los datos
+        // 1. Creamos una lista que contiene nuestro usuario de prueba.
+        List<User> usersFound = List.of(testUser);
 
-        // Act
-        Optional<User> result = userService.findByUsername("pgomez");
+        // 2. Le decimos a Mockito que cuando se llame a userRepository.findByFirstName,
+        //    debe devolver la lista que acabamos de crear.
+        when(userRepository.findByFirstName(anyString())).thenReturn(usersFound);
 
-        // Assert
-        assertTrue(result.isPresent());
-        assertEquals(testUser.getUsername(), result.get().getUsername());
+        // Act: Ejecutamos el método que queremos probar
+        List<User> result = userService.findByFirstName("Pablo");
+
+        assertNotNull(result); // La lista no debe ser nula
+        assertFalse(result.isEmpty()); // La lista no debe estar vacía
+        assertEquals(1, result.size()); // Esperamos un solo usuario en la lista
+        assertEquals("Pablo", result.get(0).getFirstName()); // Verificamos que es el usuario correcto
+    }
+
+    @Test
+    void findByFirstName_NotFound() {
+        // Arrange: Simulamos que el repositorio no encuentra a nadie
+        // Le decimos a Mockito que devuelva una lista vacía.
+        when(userRepository.findByFirstName(anyString())).thenReturn(Collections.emptyList());
+
+        // Act: Ejecutamos el método
+        List<User> result = userService.findByFirstName("NombreInexistente");
+        
+        assertNotNull(result); // La lista no debe ser nula
+        assertTrue(result.isEmpty()); // La lista SÍ debe estar vacía
     }
 
     @Test

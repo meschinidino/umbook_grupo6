@@ -42,7 +42,6 @@ class FriendRequestServiceTest {
         // Set up test users
         sender = new User();
         sender.setId(1L);
-        sender.setUsername("sender");
         sender.setFirstName("John");
         sender.setLastName("Doe");
         sender.setEmail("john.doe@example.com");
@@ -50,7 +49,6 @@ class FriendRequestServiceTest {
 
         receiver = new User();
         receiver.setId(2L);
-        receiver.setUsername("receiver");
         receiver.setFirstName("Jane");
         receiver.setLastName("Smith");
         receiver.setEmail("jane.smith@example.com");

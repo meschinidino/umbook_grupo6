@@ -102,7 +102,7 @@ public class NotificationService {
         notificationRepository.delete(notification);
     }
 
-    @Transactional
+   /* @Transactional
     public void createBirthdayNotifications() {
         // Get users with birthdays today
         List<User> usersWithBirthdayToday = userRepository.findUsersWithBirthdayOn(LocalDate.now());
@@ -152,7 +152,7 @@ public class NotificationService {
                 }
             }
         }
-    }
+    }*/
 
     @Transactional(readOnly = true)
     public List<Notification> getNotificationsByType(Long userId, Notification.NotificationType type) {

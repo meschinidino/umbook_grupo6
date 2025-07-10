@@ -86,7 +86,7 @@ public class NotificationController {
         }
     }
 
-    @PostMapping("/create-birthday-notifications")
+    /*@PostMapping("/create-birthday-notifications")
     public ResponseEntity<?> createBirthdayNotifications() {
         try {
             notificationService.createBirthdayNotifications();
@@ -98,7 +98,7 @@ public class NotificationController {
             response.put("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-    }
+    }*/
 
     @GetMapping("/user/{userId}/type/{type}")
     public ResponseEntity<List<Notification>> getNotificationsByType(

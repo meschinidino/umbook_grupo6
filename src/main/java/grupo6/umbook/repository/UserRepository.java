@@ -15,15 +15,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
+    // Un nombre o apellido no es único, por lo que debe devolver una lista.
+    List<User> findByFirstName(String firstname);
+    List<User> findByLastName(String lastname);
+
     boolean existsByEmail(String email);
 
     @Query("SELECT u FROM User u WHERE LOWER(u.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     List<User> findByNameContaining(@Param("searchTerm") String searchTerm);
 
-    @Query("SELECT u FROM User u WHERE u.enabled = true AND u.birthDate IS NOT NULL AND FUNCTION('MONTH', u.birthDate) = FUNCTION('MONTH', :date) AND FUNCTION('DAY', u.birthDate) = FUNCTION('DAY', :date)")
-    List<User> findUsersWithBirthdayOn(@Param("date") LocalDate date);
-
-    List<User> findByEnabledTrueAndBirthDateIsNotNull();
-
-    // La lógica para filtrar cumpleaños en los próximos n días se recomienda implementarla en el servicio.
+    // El comentario sobre implementar la lógica de cumpleaños en el servicio es una excelente práctica.
+    // Este método obtiene todos los usuarios con fecha de nacimiento para ser filtrados en la capa de servicio.
+    @Query("SELECT u FROM User u WHERE u.enabled = true AND u.birthDate IS NOT NULL")
+    List<User> findAllActiveUsersWithBirthDate();
 }

@@ -37,18 +37,18 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
-        String username = credentials.get("username");
+        String email = credentials.get("email");
         String password = credentials.get("password");
 
-        if (username == null || password == null) {
+        if (email == null || password == null) {
             Map<String, String> response = new HashMap<>();
-            response.put("error", "Username and password are required");
+            response.put("error", "Email and password are required");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        boolean authenticated = userService.authenticate(username, password);
+        boolean authenticated = userService.authenticate(email, password);
         if (authenticated) {
-            Optional<User> userOpt = userService.findByUsername(username);
+            Optional<User> userOpt = userService.findByEmail(email);
             if (userOpt.isPresent()) {
                 User user = userOpt.get();
                 // Don't return the password in the response

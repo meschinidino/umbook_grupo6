@@ -3,6 +3,7 @@ package grupo6.umbook.model;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -13,40 +14,46 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String firstName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String lastName;
 
     private LocalDate birthDate;
 
+    @Column(length = 20)
     private String gender;
 
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(length = 20)
     private String phone;
 
     @Column(nullable = false)
-    private String password;
+    private String password; // ¡Importante! Esto debería estar hasheado.
 
     private boolean enabled = true;
 
     private Integer birthdayReminderDays;
 
-    @ManyToMany
+    // --- Relaciones ---
+
+    @ManyToMany(fetch = FetchType.LAZY) // Usar LAZY para mejor rendimiento
     @JoinTable(
-        name = "user_friends",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "friend_id")
+            name = "user_friends",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
     private Set<User> friends = new HashSet<>();
 
-    @OneToMany(mappedBy = "receiver")
+    // CascadeType.ALL y orphanRemoval=true aseguran que las solicitudes de amistad
+    // se gestionen automáticamente cuando un usuario es eliminado.
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<FriendRequest> receivedFriendRequests = new HashSet<>();
 
-    @OneToMany(mappedBy = "sender")
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<FriendRequest> sentFriendRequests = new HashSet<>();
 
     // Constructors
@@ -178,15 +185,20 @@ public class User {
         friend.getFriends().remove(this);
     }
 
+    // --- Métodos equals y hashCode ---
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof User user)) return false;
-        return id != null && id.equals(user.id);
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        // Se usa el ID para la igualdad si no es nulo, de lo contrario, no son iguales.
+        return id != null && Objects.equals(id, user.id);
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        // Usar el ID para un hashCode consistente una vez que la entidad es persistida.
+        // El valor 31 es un número primo comúnmente usado en estos casos.
+        return Objects.hash(id);
     }
 }
