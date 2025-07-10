@@ -34,7 +34,10 @@ dependencies {
     // Conector para la base de datos MySQL
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+
     // ---- Dependencias para Pruebas (estándar) ----
+
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
