@@ -314,3 +314,73 @@ button {
     border: 1px solid #dcdfe3;
     color: #333;
 }
+
+/* --- Estilos para la página de Grupos --- */
+.groups-header {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #ddd;
+}
+
+.groups-header .back-link {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.groups-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.groups-actions .btn-primary {
+    padding: 0.6rem 1rem;
+}
+
+.group-list .group-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+}
+
+.group-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.group-info {
+    flex-grow: 1;
+}
+
+.group-info h3 {
+    margin: 0 0 0.25rem 0;
+}
+
+.group-info small {
+    color: #657786;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.group-info p {
+    margin: 0;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.group-item .btn-secondary-outline {
+    padding: 0.5rem 1rem;
+}

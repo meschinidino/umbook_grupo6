@@ -1,8 +1,6 @@
 package grupo6.umbook.service;
 
-import grupo6.umbook.model.Group;
-import grupo6.umbook.model.Notification;
-import grupo6.umbook.model.User;
+import grupo6.umbook.model.*;
 import grupo6.umbook.repository.GroupRepository;
 import grupo6.umbook.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +32,9 @@ public class GroupService {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Group name cannot be empty");
         }
-
         if (groupRepository.existsByName(name)) {
             throw new IllegalArgumentException("Group name already exists");
         }
-
         User creator = userRepository.findById(creatorId)
                 .orElseThrow(() -> new IllegalArgumentException("Creator not found"));
 
@@ -86,7 +82,6 @@ public class GroupService {
         }
 
         if (name != null && !name.trim().isEmpty()) {
-            // Check if the new name is different from the current one and not already taken
             if (!name.equals(group.getName()) && groupRepository.existsByName(name)) {
                 throw new IllegalArgumentException("Group name already exists");
             }
@@ -109,19 +104,16 @@ public class GroupService {
         User inviter = userRepository.findById(inviterId)
                 .orElseThrow(() -> new IllegalArgumentException("Inviter not found"));
 
-        // Check if the inviter has permission to add members
-        if (!group.getCreator().equals(inviter) && 
-            group.getInvitePermission() == Group.GroupPermission.ADMIN_ONLY) {
+        if (!group.getCreator().equals(inviter) &&
+                group.getInvitePermission() == GroupPermission.ADMIN_ONLY) {
             throw new IllegalArgumentException("You don't have permission to add members to this group");
         }
 
-        // Check if the inviter is a member (for MEMBERS_ONLY permission)
-        if (group.getInvitePermission() == Group.GroupPermission.MEMBERS_ONLY && 
-            !group.getMembers().contains(inviter)) {
+        if (group.getInvitePermission() == GroupPermission.MEMBERS_ONLY &&
+                !group.getMembers().contains(inviter)) {
             throw new IllegalArgumentException("You must be a member to add others to this group");
         }
 
-        // Check if the user is already a member
         if (group.getMembers().contains(user)) {
             throw new IllegalArgumentException("User is already a member of this group");
         }
@@ -129,7 +121,6 @@ public class GroupService {
         group.addMember(user);
         Group savedGroup = groupRepository.save(group);
 
-        // Create notification for the user using NotificationService
         notificationService.createNotification(
                 user.getId(),
                 inviter.getFirstName() + " " + inviter.getLastName() + " added you to the group " + group.getName(),
@@ -140,6 +131,10 @@ public class GroupService {
         return savedGroup;
     }
 
+    /**
+     * MODIFICADO: Se añade la lógica del diagrama de estados.
+     * Si al eliminar un miembro el grupo queda vacío, su estado cambia a SIN_MIEMBROS.
+     */
     @Transactional
     public Group removeMemberFromGroup(Long groupId, Long userId, Long removerId) {
         Group group = groupRepository.findById(groupId)
@@ -149,37 +144,64 @@ public class GroupService {
         User remover = userRepository.findById(removerId)
                 .orElseThrow(() -> new IllegalArgumentException("Remover not found"));
 
-        // Check if the remover is the creator or the user themselves
         if (!group.getCreator().equals(remover) && !user.equals(remover)) {
             throw new IllegalArgumentException("You don't have permission to remove this member");
         }
 
-        // Check if the user is a member
         if (!group.getMembers().contains(user)) {
             throw new IllegalArgumentException("User is not a member of this group");
         }
 
-        // Cannot remove the creator
         if (user.equals(group.getCreator())) {
             throw new IllegalArgumentException("Cannot remove the creator from the group");
         }
 
         group.removeMember(user);
+
+        // Lógica del diagrama de estados
+        if (group.getMembers().isEmpty()) {
+            group.setState(GroupState.SIN_MIEMBROS);
+        }
+
         return groupRepository.save(group);
     }
 
+    /**
+     * AÑADIDO: Método para el borrado lógico según el diagrama de estados.
+     * Solo se puede eliminar un grupo si su estado es SIN_MIEMBROS.
+     */
     @Transactional
-    public Group setGroupPermissions(Long groupId, Long userId, 
-                                    Group.GroupVisibility visibility,
-                                    Group.GroupPermission postPermission,
-                                    Group.GroupPermission commentPermission,
-                                    Group.GroupPermission invitePermission) {
+    public void deleteGroup(Long groupId, Long userId) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new IllegalArgumentException("Group not found"));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // Check if the user is the creator
+        // Solo el creador puede eliminar el grupo
+        if (!group.getCreator().equals(user)) {
+            throw new IllegalArgumentException("Only the creator can delete the group");
+        }
+
+        // El grupo debe estar sin miembros para poder ser eliminado
+        if (group.getState() != GroupState.SIN_MIEMBROS) {
+            throw new IllegalStateException("Cannot delete a group that still has members.");
+        }
+
+        group.setState(GroupState.ELIMINADO);
+        groupRepository.save(group);
+    }
+
+    @Transactional
+    public Group setGroupPermissions(Long groupId, Long userId,
+                                     GroupVisibility visibility,
+                                     GroupPermission postPermission,
+                                     GroupPermission commentPermission,
+                                     GroupPermission invitePermission) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("Group not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
         if (!group.getCreator().equals(user)) {
             throw new IllegalArgumentException("Only the creator can set group permissions");
         }
@@ -187,15 +209,12 @@ public class GroupService {
         if (visibility != null) {
             group.setVisibility(visibility);
         }
-
         if (postPermission != null) {
             group.setPostPermission(postPermission);
         }
-
         if (commentPermission != null) {
             group.setCommentPermission(commentPermission);
         }
-
         if (invitePermission != null) {
             group.setInvitePermission(invitePermission);
         }

@@ -1,7 +1,6 @@
 package grupo6.umbook.controller;
 
-import grupo6.umbook.model.Group;
-import grupo6.umbook.model.User;
+import grupo6.umbook.model.*;
 import grupo6.umbook.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -138,28 +137,66 @@ public class GroupController {
         }
     }
 
+    // AÑADIDO: Endpoint para el borrado lógico de un grupo.
+    @DeleteMapping("/{groupId}")
+    public ResponseEntity<?> deleteGroup(@PathVariable Long groupId, @RequestParam Long userId) {
+        try {
+            groupService.deleteGroup(groupId, userId);
+            return ResponseEntity.ok().body(Map.of("message", "Group marked as deleted successfully."));
+        } catch (Exception e) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
     @PutMapping("/{groupId}/permissions")
     public ResponseEntity<?> setGroupPermissions(
             @PathVariable Long groupId,
             @RequestBody Map<String, Object> request) {
         try {
-            Long userId = Long.valueOf(request.get("userId").toString());
-            Group.GroupVisibility visibility = request.get("visibility") != null ?
-                    Group.GroupVisibility.valueOf((String) request.get("visibility")) : null;
-            Group.GroupPermission postPermission = request.get("postPermission") != null ?
-                    Group.GroupPermission.valueOf((String) request.get("postPermission")) : null;
-            Group.GroupPermission commentPermission = request.get("commentPermission") != null ?
-                    Group.GroupPermission.valueOf((String) request.get("commentPermission")) : null;
-            Group.GroupPermission invitePermission = request.get("invitePermission") != null ?
-                    Group.GroupPermission.valueOf((String) request.get("invitePermission")) : null;
+            // --- VALIDACIÓN DE userId ---
+            // 1. Verificamos que el userId exista en la petición antes de usarlo.
+            Object userIdObj = request.get("userId");
+            if (userIdObj == null) {
+                Map<String, String> response = new HashMap<>();
+                response.put("error", "userId is required");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+            Long userId = Long.valueOf(userIdObj.toString());
+
+            // --- MANEJO SEGURO DE ENUMS ---
+            // 2. Hacemos la conversión a enum insensible a mayúsculas y a prueba de nulos.
+            String visibilityStr = (String) request.get("visibility");
+            String postPermissionStr = (String) request.get("postPermission");
+            String commentPermissionStr = (String) request.get("commentPermission");
+            String invitePermissionStr = (String) request.get("invitePermission");
+
+            // Usamos .toUpperCase() para evitar errores por mayúsculas/minúsculas
+            GroupVisibility visibility = visibilityStr != null ?
+                    GroupVisibility.valueOf(visibilityStr.toUpperCase()) : null;
+            GroupPermission postPermission = postPermissionStr != null ?
+                    GroupPermission.valueOf(postPermissionStr.toUpperCase()) : null;
+            GroupPermission commentPermission = commentPermissionStr != null ?
+                    GroupPermission.valueOf(commentPermissionStr.toUpperCase()) : null;
+            GroupPermission invitePermission = invitePermissionStr != null ?
+                    GroupPermission.valueOf(invitePermissionStr.toUpperCase()) : null;
 
             Group group = groupService.setGroupPermissions(
                     groupId, userId, visibility, postPermission, commentPermission, invitePermission);
+
             return ResponseEntity.ok(group);
+
         } catch (IllegalArgumentException e) {
+            // Este catch ahora manejará errores si se envía un valor de enum inválido (ej. "PUBLI")
             Map<String, String> response = new HashMap<>();
-            response.put("error", e.getMessage());
+            response.put("error", "Invalid value for permission or visibility: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            // Catch general para otros posibles errores
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "An unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 

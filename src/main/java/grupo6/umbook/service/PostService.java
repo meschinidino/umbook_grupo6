@@ -1,9 +1,6 @@
 package grupo6.umbook.service;
 
-import grupo6.umbook.model.Group;
-import grupo6.umbook.model.Notification;
-import grupo6.umbook.model.Post;
-import grupo6.umbook.model.User;
+import grupo6.umbook.model.*;
 import grupo6.umbook.repository.GroupRepository;
 import grupo6.umbook.repository.PostRepository;
 import grupo6.umbook.repository.UserRepository;
@@ -83,7 +80,7 @@ public class PostService {
         }
 
         // Check posting permissions
-        if (group.getPostPermission() == Group.GroupPermission.ADMIN_ONLY && 
+        if (group.getPostPermission() == GroupPermission.ADMIN_ONLY &&
             !group.getCreator().equals(author)) {
             throw new IllegalArgumentException("Only the group admin can post in this group");
         }

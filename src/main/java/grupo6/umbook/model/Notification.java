@@ -25,6 +25,7 @@ public class Notification {
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Column(name = "is_read")
     private boolean read = false;
 
     private LocalDateTime readAt;

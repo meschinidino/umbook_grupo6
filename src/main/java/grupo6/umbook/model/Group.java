@@ -25,14 +25,19 @@ public class Group {
 
     @ManyToMany
     @JoinTable(
-        name = "group_members",
-        joinColumns = @JoinColumn(name = "group_id"),
-        inverseJoinColumns = @JoinColumn(name = "user_id")
+            name = "group_members",
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> members = new HashSet<>();
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    // AÑADIDO: Campo para el diagrama de estados
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private GroupState state = GroupState.CON_MIEMBROS;
 
     @Enumerated(EnumType.STRING)
     private GroupVisibility visibility = GroupVisibility.PUBLIC;
@@ -46,16 +51,7 @@ public class Group {
     @Enumerated(EnumType.STRING)
     private GroupPermission invitePermission = GroupPermission.ALL;
 
-    // Enums for group permissions
-    public enum GroupVisibility {
-        PUBLIC, PRIVATE
-    }
-
-    public enum GroupPermission {
-        ALL, MEMBERS_ONLY, ADMIN_ONLY
-    }
-
-    // Constructors
+    // Constructores
     public Group() {
     }
 
@@ -63,106 +59,39 @@ public class Group {
         this.name = name;
         this.description = description;
         this.creator = creator;
-        this.members.add(creator); // Creator is automatically a member
+        this.members.add(creator); // El creador es miembro automáticamente
+        this.state = GroupState.CON_MIEMBROS; // Al tener un miembro, el estado es CON_MIEMBROS
     }
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
+    // Getters y Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public User getCreator() { return creator; }
+    public void setCreator(User creator) { this.creator = creator; }
+    public Set<User> getMembers() { return members; }
+    public void setMembers(Set<User> members) { this.members = members; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public GroupState getState() { return state; } // AÑADIDO
+    public void setState(GroupState state) { this.state = state; } // AÑADIDO
+    public GroupVisibility getVisibility() { return visibility; }
+    public void setVisibility(GroupVisibility visibility) { this.visibility = visibility; }
+    public GroupPermission getPostPermission() { return postPermission; }
+    public void setPostPermission(GroupPermission postPermission) { this.postPermission = postPermission; }
+    public GroupPermission getCommentPermission() { return commentPermission; }
+    public void setCommentPermission(GroupPermission commentPermission) { this.commentPermission = commentPermission; }
+    public GroupPermission getInvitePermission() { return invitePermission; }
+    public void setInvitePermission(GroupPermission invitePermission) { this.invitePermission = invitePermission; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public User getCreator() {
-        return creator;
-    }
-
-    public void setCreator(User creator) {
-        this.creator = creator;
-    }
-
-    public Set<User> getMembers() {
-        return members;
-    }
-
-    public void setMembers(Set<User> members) {
-        this.members = members;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public GroupVisibility getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(GroupVisibility visibility) {
-        this.visibility = visibility;
-    }
-
-    public GroupPermission getPostPermission() {
-        return postPermission;
-    }
-
-    public void setPostPermission(GroupPermission postPermission) {
-        this.postPermission = postPermission;
-    }
-
-    public GroupPermission getCommentPermission() {
-        return commentPermission;
-    }
-
-    public void setCommentPermission(GroupPermission commentPermission) {
-        this.commentPermission = commentPermission;
-    }
-
-    public GroupPermission getInvitePermission() {
-        return invitePermission;
-    }
-
-    public void setInvitePermission(GroupPermission invitePermission) {
-        this.invitePermission = invitePermission;
-    }
-
-    // Helper methods
-    public void addMember(User user) {
-        this.members.add(user);
-    }
-
-    public void removeMember(User user) {
-        this.members.remove(user);
-    }
-
-    public boolean isMember(User user) {
-        return this.members.contains(user);
-    }
-
-    public boolean isCreator(User user) {
-        return this.creator.equals(user);
-    }
+    // Métodos de ayuda
+    public void addMember(User user) { this.members.add(user); }
+    public void removeMember(User user) { this.members.remove(user); }
+    public boolean isMember(User user) { return this.members.contains(user); }
+    public boolean isCreator(User user) { return this.creator.equals(user); }
 
     @Override
     public boolean equals(Object o) {
@@ -174,6 +103,6 @@ public class Group {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return 31;
     }
 }

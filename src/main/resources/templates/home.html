@@ -9,23 +9,7 @@
 <body class="home-body">
 
 <div class="home-container">
-    <aside class="sidebar-left">
-        <h1 class="home-logo">UMbook</h1>
-        <nav class="main-nav">
-            <ul>
-                <li class="active"><a href="#"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="#"><i class="fas fa-bell"></i> Notifications</a></li>
-                <li><a href="#"><i class="fas fa-envelope"></i> Messages</a></li>
-                <li><a href="#"><i class="fas fa-bookmark"></i> Albums</a></li>
-                <li><a href="#"><i class="fas fa-list-ul"></i> Lists</a></li>
-                <li><a href="#"><i class="fas fa-users"></i> Groups</a></li>
-                <li><a href="#"><i class="fas fa-user-check"></i> Subscriptions</a></li>
-                <li><a href="#"><i class="fas fa-credit-card"></i> Add Card</a></li>
-                <li><a href="#"><i class="fas fa-user"></i> My Profile</a></li>
-            </ul>
-        </nav>
-        <button class="btn-new-post">New Post</button>
-    </aside>
+    <aside class="sidebar-left" th:replace="~{fragments/sidebar :: sidebar}"></aside>
 
     <main class="feed">
         <article class="post">
@@ -47,27 +31,6 @@
                 <a href="#" class="bookmark-icon"><i class="far fa-bookmark"></i></a>
             </footer>
         </article>
-
-        <article class="post">
-            <header class="post-header">
-                <img src="https://i.pravatar.cc/50?img=2" alt="Avatar" class="avatar">
-                <div class="user-info">
-                    <strong>John Doe</strong>
-                    <span>@johndoe</span>
-                </div>
-                <i class="fas fa-ellipsis-h post-options"></i>
-            </header>
-            <div class="post-content">
-                <p>Follow your dreams. They know the way. ✨</p>
-                <img src="https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?q=80&w=1887" alt="Post image" class="post-image">
-            </div>
-            <footer class="post-actions">
-                <a href="#"><i class="far fa-heart"></i> 250</a>
-                <a href="#"><i class="far fa-comment"></i> 45</a>
-                <a href="#"><i class="far fa-share-square"></i> Share</a>
-                <a href="#" class="bookmark-icon"><i class="far fa-bookmark"></i></a>
-            </footer>
-        </article>
     </main>
 
     <aside class="sidebar-right">
@@ -78,7 +41,10 @@
             </div>
             <i class="fas fa-bell notification-bell"></i>
         </div>
-        
+        <div class="widget-card">
+        </div>
+    </aside>
+</div>
 
 </body>
 </html>

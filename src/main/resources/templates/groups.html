@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Grupos - UMbook</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="home-body">
+
+<div class="home-container">
+    <aside class="sidebar-left" th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <main class="feed">
+        <div class="groups-header">
+            <a th:href="@{/home}" class="back-link"><i class="fas fa-arrow-left"></i> Groups</a>
+            <div class="groups-actions">
+                <button class="btn-primary">Create Group</button>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search">
+                </div>
+            </div>
+        </div>
+
+        <div class="group-list">
+            <div class="group-item">
+                <img src="/images/default-group.png" alt="Avatar del Grupo" class="group-avatar">
+                <div class="group-info">
+                    <h3>Grupo de Ejemplo</h3>
+                    <small>10+ posts a day</small>
+                    <p>Descripción del grupo de ejemplo...</p>
+                </div>
+                <button class="btn-secondary-outline">Message</button>
+            </div>
+        </div>
+    </main>
+
+    <aside class="sidebar-right">
+    </aside>
+</div>
+
+</body>
+</html>
