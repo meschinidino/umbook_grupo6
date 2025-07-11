@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Grupo - UMbook</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="home-body">
+
+<div class="home-container">
+    <aside class="sidebar-left" th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <main class="feed">
+        <div class="create-group-container">
+            <div class="groups-header">
+                <a th:href="@{/groups}" class="back-link"><i class="fas fa-arrow-left"></i> Create Group</a>
+            </div>
+
+            <form th:action="@{/groups/create}" th:object="${groupRequest}" method="post" class="create-group-form">
+
+                <div class="form-section cover-photo-section">
+                    <label for="cover-photo" class="file-upload-label cover-photo-upload">
+                        <i class="fas fa-camera"></i>
+                        <span>Add Cover Photo</span>
+                    </label>
+                    <input type="file" id="cover-photo" name="coverPhoto" class="file-upload-input">
+                </div>
+
+                <div class="form-section profile-info-section">
+                    <div class="profile-photo-upload-wrapper">
+                        <label for="profile-photo" class="file-upload-label profile-photo-upload">
+                            <i class="fas fa-camera"></i>
+                            <span>Add Profile Photo</span>
+                        </label>
+                        <input type="file" id="profile-photo" name="profilePhoto" class="file-upload-input">
+                    </div>
+                    <div class="group-name-wrapper">
+                        <label for="group-name">Group Name</label>
+                        <input type="text" id="group-name" th:field="*{name}" placeholder="Write here..." required>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <label for="group-details">Group Details</label>
+                    <textarea id="group-details" th:field="*{description}" placeholder="Write here..."></textarea>
+                </div>
+
+                <div class="form-links">
+                    <a href="#" id="add-members-link">+ Add Members</a>
+                    <a href="#">+ Add Permissions?</a>
+                </div>
+
+                <div id="add-members-section">
+                    <div class="search-bar members-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search Members">
+                    </div>
+
+                    <h4 class="suggested-title">Suggested</h4>
+
+                    <ul class="members-list">
+                        <li class="member-item">
+                            <div class="member-info">
+                                <img src="https://i.pravatar.cc/40?img=4" alt="Avatar" class="avatar small-avatar">
+                                <div class="user-details">
+                                    <strong>Zada Jackson</strong>
+                                    <span>@zadajackson</span>
+                                </div>
+                                <i class="fas fa-check-circle verified-check"></i>
+                            </div>
+                            <button class="btn-primary add-btn">Add</button>
+                        </li>
+
+                        <li class="member-item">
+                            <div class="member-info">
+                                <img src="https://i.pravatar.cc/40?img=5" alt="Avatar" class="avatar small-avatar">
+                                <div class="user-details">
+                                    <strong>Craig Saris</strong>
+                                    <span>@3adajackson</span>
+                                </div>
+                                <i class="fas fa-check-circle verified-check"></i>
+                            </div>
+                            <button class="btn-primary add-btn">Add</button>
+                        </li>
+                    </ul>
+                </div>
+
+            </form>
+                <button type="submit" class="btn-primary form-submit-btn">Done</button>
+
+            </form>
+        </div>
+    </main>
+</div>
+<script>
+    // Espera a que la página se cargue completamente
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Obtenemos el enlace y la sección que queremos mostrar/ocultar
+        const addMembersLink = document.getElementById('add-members-link');
+        const membersSection = document.getElementById('add-members-section');
+
+        // Añadimos un "escuchador" para el evento de clic
+        addMembersLink.addEventListener('click', function(event) {
+
+            // Prevenimos que el enlace recargue la página (comportamiento por defecto de href="#")
+            event.preventDefault();
+
+            // Alternamos la clase 'visible' en la sección de miembros.
+            // Si no la tiene, la añade. Si la tiene, la quita.
+            membersSection.classList.toggle('visible');
+        });
+    });
+</script>
+
+</body>
+</html>

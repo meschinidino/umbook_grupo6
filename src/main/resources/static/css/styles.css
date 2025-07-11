@@ -384,3 +384,178 @@ button {
 .group-item .btn-secondary-outline {
     padding: 0.5rem 1rem;
 }
+
+/* --- Estilos para la página Create Group --- */
+.create-group-container {
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.create-group-form {
+    padding: 1.5rem;
+}
+
+.form-section {
+    margin-bottom: 1.5rem;
+}
+
+.file-upload-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 0.5rem;
+    background-color: #f0f2f5;
+    border-radius: 8px;
+    border: 2px dashed #dcdfe3;
+    cursor: pointer;
+    color: #657786;
+    font-weight: bold;
+}
+
+.file-upload-label:hover {
+    background-color: #e4e6eb;
+}
+
+.file-upload-input {
+    display: none; /* Ocultamos el input de archivo por defecto */
+}
+
+.cover-photo-upload {
+    height: 200px;
+    font-size: 1.2rem;
+}
+
+.profile-info-section {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5rem;
+}
+
+.profile-photo-upload-wrapper {
+    flex-shrink: 0;
+}
+
+.profile-photo-upload {
+    width: 120px;
+    height: 120px;
+}
+
+.group-name-wrapper {
+    width: 100%;
+}
+
+.create-group-form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.create-group-form input[type="text"],
+.create-group-form textarea {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #dcdfe3;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.create-group-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-links {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.form-links a {
+    color: #1877f2;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.form-submit-btn {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+}
+
+/* --- Estilos para la sección de Añadir Miembros --- */
+
+/* Por defecto, la sección está oculta */
+#add-members-section {
+    display: none;
+    border-top: 1px solid #eee;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+}
+
+/* Cuando tenga la clase .visible, se mostrará */
+#add-members-section.visible {
+    display: block;
+}
+
+.members-search {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.suggested-title {
+    font-weight: bold;
+    margin: 0 0 1rem 0;
+}
+
+.members-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.member-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.member-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.small-avatar {
+    width: 40px;
+    height: 40px;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-details strong {
+    font-size: 0.9rem;
+}
+
+.user-details span {
+    font-size: 0.8rem;
+    color: #657786;
+}
+
+.verified-check {
+    color: #1DA1F2; /* Un azul tipo Twitter */
+    margin-left: 0.25rem;
+}
+
+.add-btn {
+    padding: 0.4rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
