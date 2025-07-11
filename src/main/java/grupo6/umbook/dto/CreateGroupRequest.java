@@ -1,49 +1,50 @@
 package grupo6.umbook.dto;
 
-/**
- * Esta clase (DTO) se usa para transportar los datos del formulario
- * para crear un nuevo grupo.
- */
+import org.springframework.web.multipart.MultipartFile; // <-- AÑADIR ESTE IMPORT
+
 public class CreateGroupRequest {
 
     private String name;
     private String description;
+    private String visibility;
+    private String postPermission;
+    private String commentPermission;
+    private String invitePermission;
 
-    // Dejamos los campos para las fotos como String por simplicidad,
-    // en una implementación real manejarías archivos (MultipartFile).
-    private String coverPhoto;
-    private String profilePhoto;
+    // MODIFICADO: El tipo de dato ahora es MultipartFile
+    private MultipartFile coverPhoto;
+    private MultipartFile profilePhoto;
 
-    // Getters y Setters
-    public String getName() {
-        return name;
-    }
+    // --- GETTERS Y SETTERS ---
+    // (Los getters y setters para name, description, y los permisos se quedan igual)
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public String getVisibility() { return visibility; }
+    public void setVisibility(String visibility) { this.visibility = visibility; }
+    public String getPostPermission() { return postPermission; }
+    public void setPostPermission(String postPermission) { this.postPermission = postPermission; }
+    public String getCommentPermission() { return commentPermission; }
+    public void setCommentPermission(String commentPermission) { this.commentPermission = commentPermission; }
+    public String getInvitePermission() { return invitePermission; }
+    public void setInvitePermission(String invitePermission) { this.invitePermission = invitePermission; }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getCoverPhoto() {
+    // MODIFICADOS: Getters y Setters para los archivos
+    public MultipartFile getCoverPhoto() {
         return coverPhoto;
     }
 
-    public void setCoverPhoto(String coverPhoto) {
+    public void setCoverPhoto(MultipartFile coverPhoto) {
         this.coverPhoto = coverPhoto;
     }
 
-    public String getProfilePhoto() {
+    public MultipartFile getProfilePhoto() {
         return profilePhoto;
     }
 
-    public void setProfilePhoto(String profilePhoto) {
+    public void setProfilePhoto(MultipartFile profilePhoto) {
         this.profilePhoto = profilePhoto;
     }
 }

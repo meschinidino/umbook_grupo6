@@ -1,5 +1,6 @@
 package grupo6.umbook.service;
 
+import grupo6.umbook.dto.CreateGroupRequest;
 import grupo6.umbook.model.*;
 import grupo6.umbook.repository.GroupRepository;
 import grupo6.umbook.repository.UserRepository;
@@ -28,7 +29,10 @@ public class GroupService {
     }
 
     @Transactional
-    public Group createGroup(String name, String description, Long creatorId) {
+    public Group createGroup(CreateGroupRequest request, Long creatorId) {
+        String name = request.getName();
+        String description = request.getDescription();
+
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Group name cannot be empty");
         }
@@ -39,6 +43,16 @@ public class GroupService {
                 .orElseThrow(() -> new IllegalArgumentException("Creator not found"));
 
         Group group = new Group(name, description, creator);
+
+        // Aquí también establecemos los permisos que vienen en el DTO
+        if (request.getVisibility() != null) {
+            group.setVisibility(GroupVisibility.valueOf(request.getVisibility().toUpperCase()));
+        }
+        if (request.getPostPermission() != null) {
+            group.setPostPermission(GroupPermission.valueOf(request.getPostPermission().toUpperCase()));
+        }
+        // ... y así con los otros permisos si los tenés en el DTO ...
+
         return groupRepository.save(group);
     }
 

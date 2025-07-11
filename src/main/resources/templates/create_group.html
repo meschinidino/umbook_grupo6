@@ -17,7 +17,7 @@
                 <a th:href="@{/groups}" class="back-link"><i class="fas fa-arrow-left"></i> Create Group</a>
             </div>
 
-            <form th:action="@{/groups/create}" th:object="${groupRequest}" method="post" class="create-group-form">
+            <form th:action="@{/groups/create}" th:object="${groupRequest}" method="post" enctype="multipart/form-data" class="create-group-form">
 
                 <div class="form-section cover-photo-section">
                     <label for="cover-photo" class="file-upload-label cover-photo-upload">
@@ -36,6 +36,9 @@
                         <input type="file" id="profile-photo" name="profilePhoto" class="file-upload-input">
                     </div>
                     <div class="group-name-wrapper">
+                        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">
+                            Mensaje de error
+                        </div>
                         <label for="group-name">Group Name</label>
                         <input type="text" id="group-name" th:field="*{name}" placeholder="Write here..." required>
                     </div>
@@ -45,10 +48,10 @@
                     <label for="group-details">Group Details</label>
                     <textarea id="group-details" th:field="*{description}" placeholder="Write here..."></textarea>
                 </div>
-
                 <div class="form-links">
                     <a href="#" id="add-members-link">+ Add Members</a>
-                    <a href="#">+ Add Permissions?</a>
+                    <a href="#" id="see-members-link" class="hidden-link"> See Members</a>
+                    <a href="#" id="add-permissions-link">+ Add Permissions?</a>
                 </div>
 
                 <div id="add-members-section">
@@ -56,11 +59,9 @@
                         <i class="fas fa-search"></i>
                         <input type="text" placeholder="Search Members">
                     </div>
-
                     <h4 class="suggested-title">Suggested</h4>
-
-                    <ul class="members-list">
-                        <li class="member-item">
+                    <ul class="members-list" id="suggested-members-list">
+                        <li class="member-item" data-userid="1">
                             <div class="member-info">
                                 <img src="https://i.pravatar.cc/40?img=4" alt="Avatar" class="avatar small-avatar">
                                 <div class="user-details">
@@ -69,47 +70,157 @@
                                 </div>
                                 <i class="fas fa-check-circle verified-check"></i>
                             </div>
-                            <button class="btn-primary add-btn">Add</button>
+                            <button type="button" class="btn-primary add-btn">Add</button>
                         </li>
-
-                        <li class="member-item">
+                        <li class="member-item" data-userid="2">
                             <div class="member-info">
                                 <img src="https://i.pravatar.cc/40?img=5" alt="Avatar" class="avatar small-avatar">
                                 <div class="user-details">
                                     <strong>Craig Saris</strong>
-                                    <span>@3adajackson</span>
+                                    <span>@craigsaris</span>
                                 </div>
                                 <i class="fas fa-check-circle verified-check"></i>
                             </div>
-                            <button class="btn-primary add-btn">Add</button>
+                            <button type="button" class="btn-primary add-btn">Add</button>
                         </li>
                     </ul>
                 </div>
 
-            </form>
-                <button type="submit" class="btn-primary form-submit-btn">Done</button>
+                <div id="current-members-section">
+                    <h4 class="members-title">Members</h4>
+                    <ul class="members-list" id="current-members-list">
+                    </ul>
+                </div>
 
+                <div id="add-permissions-section">
+                    <div class="permissions-card">
+                        <h4>Group Permissions</h4>
+
+                        <div class="permission-row">
+                            <label>Visibilidad del grupo</label>
+                            <div class="radio-group">
+                                <input type="radio" id="vis-private" th:field="*{visibility}" value="PRIVATE">
+                                <label for="vis-private">Privado</label>
+                                <input type="radio" id="vis-public" th:field="*{visibility}" value="PUBLIC" th:checked="true">
+                                <label for="vis-public">Público</label>
+                            </div>
+                        </div>
+
+                        <div class="permission-row">
+                            <label for="post-permission">Postear</label>
+                            <select id="post-permission" th:field="*{postPermission}">
+                                <option value="ALL">Todos</option>
+                                <option value="MEMBERS_ONLY" selected>Solo miembros</option>
+                                <option value="ADMIN_ONLY">Nadie (Solo Admins)</option>
+                            </select>
+                        </div>
+
+                        <div class="permission-row">
+                            <label for="comment-permission">Comentar</label>
+                            <select id="comment-permission" th:field="*{commentPermission}">
+                                <option value="ALL">Todos</option>
+                                <option value="MEMBERS_ONLY" selected>Solo miembros</option>
+                                <option value="ADMIN_ONLY">Nadie (Solo Admins)</option>
+                            </select>
+                        </div>
+
+                        <div class="permission-row">
+                            <label for="invite-permission">Invitar a otros</label>
+                            <select id="invite-permission" th:field="*{invitePermission}">
+                                <option value="ALL">Todos</option>
+                                <option value="MEMBERS_ONLY" selected>Solo miembros</option>
+                                <option value="ADMIN_ONLY">Nadie (Solo Admins)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary form-submit-btn">Done</button>
             </form>
         </div>
     </main>
 </div>
 <script>
-    // Espera a que la página se cargue completamente
     document.addEventListener('DOMContentLoaded', function() {
 
-        // Obtenemos el enlace y la sección que queremos mostrar/ocultar
+        // Obtenemos todos los elementos que vamos a manipular
         const addMembersLink = document.getElementById('add-members-link');
-        const membersSection = document.getElementById('add-members-section');
+        const seeMembersLink = document.getElementById('see-members-link');
+        const addPermissionsLink = document.getElementById('add-permissions-link');
 
-        // Añadimos un "escuchador" para el evento de clic
-        addMembersLink.addEventListener('click', function(event) {
+        const suggestedSection = document.getElementById('add-members-section');
+        const currentMembersSection = document.getElementById('current-members-section');
+        const permissionsSection = document.getElementById('add-permissions-section');
 
-            // Prevenimos que el enlace recargue la página (comportamiento por defecto de href="#")
-            event.preventDefault();
+        const suggestedList = document.getElementById('suggested-members-list');
+        const currentMembersList = document.getElementById('current-members-list');
 
-            // Alternamos la clase 'visible' en la sección de miembros.
-            // Si no la tiene, la añade. Si la tiene, la quita.
-            membersSection.classList.toggle('visible');
+        // --- LÓGICA PARA MOSTRAR/OCULTAR SECCIONES ---
+
+        // Al hacer clic en "+ Add Members"
+        addMembersLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            suggestedSection.classList.add('visible');
+            currentMembersSection.classList.remove('visible');
+            permissionsSection.classList.remove('visible');
+        });
+
+        // Al hacer clic en "+ See Members"
+        seeMembersLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentMembersSection.classList.add('visible');
+            suggestedSection.classList.remove('visible');
+            permissionsSection.classList.remove('visible');
+        });
+
+        // Al hacer clic en "+ Add Permissions?"
+        addPermissionsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            permissionsSection.classList.add('visible');
+            suggestedSection.classList.remove('visible');
+            currentMembersSection.classList.remove('visible');
+        });
+
+
+        // --- LÓGICA PARA AÑADIR Y QUITAR MIEMBROS ---
+
+        // Evento para los botones de "Add"
+        suggestedList.addEventListener('click', function(e) {
+            if (e.target.classList.contains('add-btn')) {
+                const memberItem = e.target.closest('.member-item');
+                if (!memberItem) return;
+
+                seeMembersLink.classList.remove('hidden-link');
+                memberItem.style.display = 'none';
+
+                const newMemberItem = memberItem.cloneNode(true);
+                const button = newMemberItem.querySelector('.add-btn');
+                button.textContent = 'Remove';
+                button.classList.remove('add-btn', 'btn-primary');
+                button.classList.add('remove-btn');
+
+                currentMembersList.appendChild(newMemberItem);
+            }
+        });
+
+        // Evento para los botones de "Remove"
+        currentMembersList.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-btn')) {
+                const itemToRemove = e.target.closest('.member-item');
+                const userId = itemToRemove.dataset.userid;
+
+                const originalItem = suggestedList.querySelector(`.member-item[data-userid="${userId}"]`);
+                if (originalItem) {
+                    originalItem.style.display = 'flex';
+                }
+
+                itemToRemove.remove();
+
+                if (currentMembersList.children.length === 0) {
+                    currentMembersSection.classList.remove('visible');
+                    seeMembersLink.classList.add('hidden-link');
+                }
+            }
         });
     });
 </script>

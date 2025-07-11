@@ -559,3 +559,170 @@ button {
     font-size: 0.9rem;
     font-weight: bold;
 }
+
+/* --- ESTILOS PARA LA FUNCIONALIDAD DE MIEMBROS EN 'CREATE GROUP' --- */
+
+/* 1. Estilos para los enlaces de control */
+.form-links {
+    display: flex;
+    justify-content: flex-start; /* Alinea los enlaces a la izquierda */
+    gap: 1.5rem;                 /* Espacio entre los enlaces */
+    margin-bottom: 2rem;
+}
+
+.hidden-link {
+    display: none;
+}
+
+/* 2. Lógica para mostrar y ocultar las secciones */
+
+/* Por defecto, ambas secciones están ocultas */
+#add-members-section,
+#current-members-section {
+    display: none;
+    border-top: 1px solid #eee;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+}
+
+/* Regla para mostrar la sección correspondiente cuando el JavaScript le añade la clase '.visible' */
+#add-members-section.visible,
+#current-members-section.visible {
+    display: block;
+}
+
+/* 3. Estilos generales para el contenido de las listas */
+.suggested-title, .members-title {
+    font-weight: bold;
+    margin: 0 0 1rem 0;
+}
+
+.members-search {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.members-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.member-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.member-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.small-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-details strong {
+    font-size: 0.9rem;
+}
+
+.user-details span {
+    font-size: 0.8rem;
+    color: #657786;
+}
+
+.verified-check {
+    color: #1DA1F2;
+    margin-left: 0.25rem;
+}
+
+.add-btn {
+    padding: 0.4rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.remove-btn {
+    background-color: #f0f2f5;
+    color: #333;
+    border: 1px solid #dcdfe3;
+    padding: 0.4rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* --- Estilos para la sección de Permisos --- */
+
+/* Oculta la sección de permisos por defecto */
+#add-permissions-section {
+    display: none;
+}
+#add-permissions-section.visible {
+    display: block;
+}
+
+.permissions-card {
+    background-color: #f7f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.permissions-card h4 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.permission-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.permission-row label {
+    font-weight: normal;
+    color: #333;
+}
+
+.permission-row .radio-group {
+    display: flex;
+    gap: 0.5rem;
+}
+.permission-row .radio-group label {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.permission-row select {
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #dcdfe3;
+    font-weight: bold;
+}
+
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    border: 1px solid transparent;
+}
+
+.alert-danger {
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+}

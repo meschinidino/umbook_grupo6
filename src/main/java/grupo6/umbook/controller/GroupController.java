@@ -1,5 +1,6 @@
 package grupo6.umbook.controller;
 
+import grupo6.umbook.dto.CreateGroupRequest;
 import grupo6.umbook.model.*;
 import grupo6.umbook.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +29,27 @@ public class GroupController {
         try {
             String name = (String) request.get("name");
             String description = (String) request.get("description");
-            Long creatorId = Long.valueOf(request.get("creatorId").toString());
 
-            if (name == null || creatorId == null) {
+            if (request.get("creatorId") == null || name == null) {
                 Map<String, String> response = new HashMap<>();
                 response.put("error", "Name and creator ID are required");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
+            Long creatorId = Long.valueOf(request.get("creatorId").toString());
 
-            Group group = groupService.createGroup(name, description, creatorId);
+            // 1. Creamos el objeto DTO que el servicio espera
+            CreateGroupRequest groupRequest = new CreateGroupRequest();
+            groupRequest.setName(name);
+            groupRequest.setDescription(description);
+            // Aquí también podrías obtener los permisos del 'request' y ponerlos en el DTO
+            // groupRequest.setVisibility((String) request.get("visibility"));
+
+            // 2. Llamamos al servicio con la firma correcta (DTO y Long)
+            Group group = groupService.createGroup(groupRequest, creatorId);
+
             return ResponseEntity.status(HttpStatus.CREATED).body(group);
-        } catch (IllegalArgumentException e) {
+
+        } catch (Exception e) {
             Map<String, String> response = new HashMap<>();
             response.put("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);

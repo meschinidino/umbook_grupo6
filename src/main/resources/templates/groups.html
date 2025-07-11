@@ -24,12 +24,12 @@
         </div>
 
         <div class="group-list">
-            <div class="group-item">
-                <img src="/images/default-group.png" alt="Avatar del Grupo" class="group-avatar">
+            <div th:each="group : ${groups}" class="group-item">
+                <img th:src="@{/images/default-group.png}" alt="Avatar del Grupo" class="group-avatar">
                 <div class="group-info">
-                    <h3>Grupo de Ejemplo</h3>
+                    <h3 th:text="${group.name}">Nombre del Grupo</h3>
                     <small>10+ posts a day</small>
-                    <p>Descripción del grupo de ejemplo...</p>
+                    <p th:text="${group.description}">Descripción del grupo...</p>
                 </div>
                 <button class="btn-secondary-outline">Message</button>
             </div>
