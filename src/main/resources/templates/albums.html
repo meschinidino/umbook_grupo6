@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Álbumes - UMbook</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="home-body">
+
+<div class="home-container">
+    <aside class="sidebar-left" th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <main class="feed">
+        <div class="groups-header">
+            <a href="/home" class="back-link"><i class="fas fa-arrow-left"></i> Albums</a>
+            <div class="groups-actions">
+                <button class="btn-primary">Create Album</button>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search">
+                </div>
+            </div>
+        </div>
+
+        <div class="album-grid">
+            <div th:each="album : ${albums}" class="album-card">
+                <div class="album-thumbnails">
+                    <img src="https://via.placeholder.com/150" alt="thumbnail">
+                    <img src="https://via.placeholder.com/150" alt="thumbnail">
+                    <img src="https://via.placeholder.com/150" alt="thumbnail">
+                    <img src="https://via.placeholder.com/150" alt="thumbnail">
+                </div>
+                <div class="album-info">
+                    <h4 th:text="${album.title}">Pets Album</h4>
+                    <span th:text="${#lists.size(album.photos)} + ' photos'">15 photos</span>
+                </div>
+                <a href="#" class="edit-icon"><i class="fas fa-pencil-alt"></i></a>
+            </div>
+        </div>
+    </main>
+
+    <aside class="sidebar-right"></aside>
+</div>
+
+</body>
+</html>
