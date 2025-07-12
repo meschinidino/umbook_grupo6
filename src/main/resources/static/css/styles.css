@@ -784,3 +784,119 @@ button {
     text-decoration: none;
     font-size: 0.9rem;
 }
+
+/* --- Estilos para la sección de permisos de grupo --- */
+.group-permissions-section {
+    margin-top: 2rem;
+    border-top: 1px solid #eee;
+    padding-top: 1.5rem;
+}
+
+.group-permission-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.group-permission-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.group-permission-toggles {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.toggle-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Estilos para el interruptor (toggle switch) */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+.slider.round {
+    border-radius: 24px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* --- ESTILOS PARA EL CONTENEDOR DEL FORMULARIO --- */
+
+/* Contenedor blanco para el formulario */
+.form-wrapper {
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+/* Encabezado dentro del contenedor */
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.form-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.form-header .back-link {
+    font-size: 1.2rem;
+    color: #333;
+}
+
+/* Formulario dentro del contenedor blanco */
+.creation-form {
+    padding: 1.5rem;
+}

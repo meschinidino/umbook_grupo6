@@ -1,14 +1,18 @@
 package grupo6.umbook.service;
 
+import grupo6.umbook.dto.CreateAlbumRequest;
 import grupo6.umbook.model.Album;
+import grupo6.umbook.model.Group;
 import grupo6.umbook.model.User;
 import grupo6.umbook.repository.AlbumRepository;
+import grupo6.umbook.repository.GroupRepository;
 import grupo6.umbook.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,26 +23,33 @@ public class AlbumService {
     private final UserRepository userRepository;
 
     @Autowired
+    private GroupRepository groupRepository;
+
+    @Autowired
     public AlbumService(AlbumRepository albumRepository, UserRepository userRepository) {
         this.albumRepository = albumRepository;
         this.userRepository = userRepository;
     }
 
     @Transactional
-    public Album createAlbum(String name, String description, Long ownerId) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Album name cannot be empty");
-        }
-
+    public Album createAlbum(CreateAlbumRequest request, Long ownerId) {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new IllegalArgumentException("Owner not found"));
 
-        // Check if album with same name already exists for this user
-        if (albumRepository.existsByNameAndOwner(name, owner)) {
-            throw new IllegalArgumentException("Album with this name already exists for this user");
+        Album album = new Album(request.getName(), request.getDescription(), owner);
+
+        // Asignamos permisos de visibilidad
+        if (request.getViewPermissionGroupIds() != null) {
+            List<Group> viewGroups = groupRepository.findAllById(request.getViewPermissionGroupIds());
+            album.setPermittedToView(new HashSet<>(viewGroups));
         }
 
-        Album album = new Album(name, description, owner);
+        // Asignamos permisos de comentario
+        if (request.getCommentPermissionGroupIds() != null) {
+            List<Group> commentGroups = groupRepository.findAllById(request.getCommentPermissionGroupIds());
+            album.setPermittedToComment(new HashSet<>(commentGroups));
+        }
+
         return albumRepository.save(album);
     }
 

@@ -1,5 +1,6 @@
 package grupo6.umbook.controller;
 
+import grupo6.umbook.dto.CreateAlbumRequest;
 import grupo6.umbook.model.Album;
 import grupo6.umbook.service.AlbumService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ public class AlbumController {
     @PostMapping
     public ResponseEntity<?> createAlbum(@RequestBody Map<String, Object> request) {
         try {
+            // Obtenemos los datos del Map
             String name = (String) request.get("name");
             String description = (String) request.get("description");
             Long ownerId = Long.valueOf(request.get("ownerId").toString());
@@ -36,9 +38,19 @@ public class AlbumController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
-            Album album = albumService.createAlbum(name, description, ownerId);
+            // 1. Creamos el objeto DTO que el servicio espera
+            CreateAlbumRequest albumRequest = new CreateAlbumRequest();
+            albumRequest.setName(name);
+            albumRequest.setDescription(description);
+            // Aquí también podrías obtener las listas de IDs para los permisos si se envían
+            // albumRequest.setViewPermissionGroupIds((List<Long>) request.get("viewPermissionGroupIds"));
+
+            // 2. Llamamos al servicio con la firma correcta (DTO y Long)
+            Album album = albumService.createAlbum(albumRequest, ownerId);
+
             return ResponseEntity.status(HttpStatus.CREATED).body(album);
-        } catch (IllegalArgumentException e) {
+
+        } catch (Exception e) {
             Map<String, String> response = new HashMap<>();
             response.put("error", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
