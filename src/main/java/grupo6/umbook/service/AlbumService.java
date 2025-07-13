@@ -2,6 +2,7 @@ package grupo6.umbook.service;
 
 import grupo6.umbook.dto.CreateAlbumRequest;
 import grupo6.umbook.model.Album;
+import grupo6.umbook.model.AlbumState;
 import grupo6.umbook.model.Group;
 import grupo6.umbook.model.User;
 import grupo6.umbook.repository.AlbumRepository;
@@ -112,12 +113,14 @@ public class AlbumService {
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new IllegalArgumentException("Album not found"));
 
-        // Check if the user is the owner
+        // Validamos que el que borra sea el dueño
         if (!album.getOwner().getId().equals(ownerId)) {
             throw new IllegalArgumentException("Only the owner can delete the album");
         }
 
-        albumRepository.delete(album);
+        // MODIFICADO: En lugar de borrar, cambiamos el estado
+        album.setState(AlbumState.ELIMINADO);
+        albumRepository.save(album);
     }
 
     @Transactional(readOnly = true)

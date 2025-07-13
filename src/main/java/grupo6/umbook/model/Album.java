@@ -30,6 +30,10 @@ public class Album {
 
     private LocalDateTime updatedAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AlbumState state;
+
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> photos = new ArrayList<>();
 
@@ -58,6 +62,7 @@ public class Album {
         this.name = name;
         this.description = description;
         this.owner = owner;
+        this.state = AlbumState.VACIO; // Un álbum nuevo siempre empieza como VACIO
     }
 
     // Getters and Setters
@@ -90,6 +95,14 @@ public class Album {
 
     public void setPermittedToComment(Set<Group> permittedToComment) {
         this.permittedToComment = permittedToComment;
+    }
+
+    public AlbumState getState() {
+        return state;
+    }
+
+    public void setState(AlbumState state) {
+        this.state = state;
     }
 
     // Helper methods

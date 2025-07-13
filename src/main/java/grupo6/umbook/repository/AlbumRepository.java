@@ -13,7 +13,9 @@ import java.util.Optional;
 @Repository
 public interface AlbumRepository extends JpaRepository<Album, Long> {
 
-    List<Album> findByOwner(User owner);
+    // Después (para ignorar los eliminados)
+    @Query("SELECT a FROM Album a WHERE a.owner = :owner AND a.state != 'ELIMINADO'")
+    List<Album> findByOwner(@Param("owner") User owner);
 
     Optional<Album> findByNameAndOwner(String name, User owner);
 
@@ -27,4 +29,5 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
 
     @Query("SELECT COUNT(p) FROM Photo p WHERE p.album.id = :albumId")
     long countPhotosByAlbumId(@Param("albumId") Long albumId);
+
 }

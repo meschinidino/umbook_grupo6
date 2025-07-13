@@ -1,6 +1,7 @@
 package grupo6.umbook.service;
 
 import grupo6.umbook.model.Album;
+import grupo6.umbook.model.AlbumState;
 import grupo6.umbook.model.Photo;
 import grupo6.umbook.model.User;
 import grupo6.umbook.repository.AlbumRepository;
@@ -40,34 +41,29 @@ public class PhotoService {
 
     @Transactional
     public Photo uploadPhoto(MultipartFile file, String description, Long albumId, Long uploaderId) throws IOException {
-        // Validate file
         validateFile(file);
-
-        // Get album and uploader
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new IllegalArgumentException("Album not found"));
         User uploader = userRepository.findById(uploaderId)
                 .orElseThrow(() -> new IllegalArgumentException("Uploader not found"));
-
-        // Check if uploader is the album owner
         if (!album.getOwner().getId().equals(uploaderId)) {
             throw new IllegalArgumentException("Only the album owner can upload photos");
         }
-
-        // Check if file with same name already exists in the album
         if (photoRepository.existsByAlbumIdAndFileName(albumId, file.getOriginalFilename())) {
             throw new IllegalArgumentException("Photo with this name already exists in the album");
         }
 
-        // Create and save photo
         Photo photo = new Photo(file.getOriginalFilename(), file.getContentType(), file.getBytes(), uploader);
         photo.setDescription(description);
-        photo.setAlbum(album);
+
+        // La lógica de asociación ya la hace album.addPhoto
 
         Photo savedPhoto = photoRepository.save(photo);
-        
-        // Add photo to album
         album.addPhoto(savedPhoto);
+
+        // AÑADIDO: Lógica del diagrama de estados
+        album.setState(AlbumState.CON_FOTO);
+
         albumRepository.save(album);
 
         return savedPhoto;
@@ -129,7 +125,7 @@ public class PhotoService {
                 .orElseThrow(() -> new IllegalArgumentException("Photo not found"));
 
         // Check if uploader is the photo uploader or album owner
-        if (!photo.getUploader().getId().equals(uploaderId) && 
+        if (!photo.getUploader().getId().equals(uploaderId) &&
             !photo.getAlbum().getOwner().getId().equals(uploaderId)) {
             throw new IllegalArgumentException("Only the uploader or album owner can update the photo");
         }
@@ -143,19 +139,20 @@ public class PhotoService {
         Photo photo = photoRepository.findById(photoId)
                 .orElseThrow(() -> new IllegalArgumentException("Photo not found"));
 
-        // Check if user is the photo uploader or album owner
-        if (!photo.getUploader().getId().equals(userId) && 
-            !photo.getAlbum().getOwner().getId().equals(userId)) {
+        if (!photo.getUploader().getId().equals(userId) &&
+                !photo.getAlbum().getOwner().getId().equals(userId)) {
             throw new IllegalArgumentException("Only the uploader or album owner can delete the photo");
         }
 
-        // Remove photo from album
         Album album = photo.getAlbum();
         album.removePhoto(photo);
-        albumRepository.save(album);
 
-        // Delete photo
-        photoRepository.delete(photo);
+        if (album.getPhotos().isEmpty()) {
+            album.setState(AlbumState.VACIO);
+        }
+
+        albumRepository.save(album); // Guardamos el álbum con su nuevo estado
+        photoRepository.delete(photo); // Eliminamos la foto físicamente
     }
 
     @Transactional(readOnly = true)
@@ -171,7 +168,7 @@ public class PhotoService {
     public boolean isUploaderOrAlbumOwner(Long photoId, Long userId) {
         Photo photo = photoRepository.findById(photoId)
                 .orElseThrow(() -> new IllegalArgumentException("Photo not found"));
-        return photo.getUploader().getId().equals(userId) || 
+        return photo.getUploader().getId().equals(userId) ||
                photo.getAlbum().getOwner().getId().equals(userId);
     }
 }
