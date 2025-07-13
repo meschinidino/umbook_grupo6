@@ -900,3 +900,78 @@ input:checked + .slider:before {
 .creation-form {
     padding: 1.5rem;
 }
+
+/* --- Estilos para la página de Detalle de Álbum (Anidada) --- */
+
+/* Este div ahora ocupa todo el espacio de la columna central y se divide en 2 */
+.album-detail-content {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    height: calc(100vh - 2rem); /* Ocupa la altura disponible de la columna */
+    overflow: hidden; /* Evita que el contenido se desborde */
+}
+
+/* Sub-columna de navegación de álbumes */
+.album-nav {
+    padding: 1.5rem;
+    border-right: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    background-color: #f7f9fa; /* Un color de fondo sutil */
+}
+
+.album-nav-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1rem;
+}
+
+.album-nav .main-nav {
+    flex-grow: 1; /* Empuja el botón "+ New Photo" hacia abajo */
+    overflow-y: auto; /* Scroll si hay muchos álbumes */
+}
+
+/* Sub-columna de fotos */
+.album-feed {
+    padding: 1.5rem;
+    overflow-y: auto; /* Scroll si hay muchas fotos */
+}
+
+.album-feed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.album-feed-header h2 {
+    margin: 0;
+}
+
+/* Grilla para las fotos */
+.photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.photo-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Menú desplegable (tu código para esto ya estaba bien) */
+.dropdown { position: relative; }
+.dropdown-toggle { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #657786; }
+.dropdown-menu { display: none; position: absolute; right: 0; top: 100%; background-color: white; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; width: 120px; }
+.dropdown-menu.visible { display: block; }
+.dropdown-menu a { display: block; padding: 0.75rem 1rem; text-decoration: none; color: #333; }
+.dropdown-menu a:hover { background-color: #f0f2f5; }

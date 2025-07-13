@@ -71,7 +71,7 @@ public class AlbumController {
 
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<List<Album>> getAlbumsByOwner(@PathVariable Long ownerId) {
-        List<Album> albums = albumService.findByOwner(ownerId);
+        List<Album> albums = albumService.findAlbumsByOwnerId(ownerId);
         return ResponseEntity.ok(albums);
     }
 

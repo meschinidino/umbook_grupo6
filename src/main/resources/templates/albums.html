@@ -24,7 +24,9 @@
         </div>
 
         <div class="album-grid">
-            <div th:each="album : ${albums}" class="album-card">
+
+            <a th:each="album : ${albums}" th:href="@{/albums/{id}(id=${album.id})}" class="album-card">
+
                 <div class="album-thumbnails">
                     <img src="https://via.placeholder.com/150" alt="thumbnail">
                     <img src="https://via.placeholder.com/150" alt="thumbnail">
@@ -35,8 +37,10 @@
                     <h4 th:text="${album.name}">Pets Album</h4>
                     <span th:text="${#lists.size(album.photos)} + ' photos'">15 photos</span>
                 </div>
-                <a href="#" class="edit-icon"><i class="fas fa-pencil-alt"></i></a>
-            </div>
+                <div class="edit-icon"><i class="fas fa-pencil-alt"></i></div>
+
+            </a>
+
         </div>
     </main>
 

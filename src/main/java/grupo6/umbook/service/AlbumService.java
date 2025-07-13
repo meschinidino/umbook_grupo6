@@ -27,25 +27,22 @@ public class AlbumService {
     private GroupRepository groupRepository;
 
     @Autowired
-    public AlbumService(AlbumRepository albumRepository, UserRepository userRepository) {
+    public AlbumService(AlbumRepository albumRepository, UserRepository userRepository, GroupRepository groupRepository) {
         this.albumRepository = albumRepository;
         this.userRepository = userRepository;
+        this.groupRepository = groupRepository;
     }
 
     @Transactional
     public Album createAlbum(CreateAlbumRequest request, Long ownerId) {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new IllegalArgumentException("Owner not found"));
-
         Album album = new Album(request.getName(), request.getDescription(), owner);
 
-        // Asignamos permisos de visibilidad
         if (request.getViewPermissionGroupIds() != null) {
             List<Group> viewGroups = groupRepository.findAllById(request.getViewPermissionGroupIds());
             album.setPermittedToView(new HashSet<>(viewGroups));
         }
-
-        // Asignamos permisos de comentario
         if (request.getCommentPermissionGroupIds() != null) {
             List<Group> commentGroups = groupRepository.findAllById(request.getCommentPermissionGroupIds());
             album.setPermittedToComment(new HashSet<>(commentGroups));
@@ -61,7 +58,7 @@ public class AlbumService {
     }
 
     @Transactional(readOnly = true)
-    public List<Album> findByOwner(Long ownerId) {
+    public List<Album> findAlbumsByOwnerId(Long ownerId) {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new IllegalArgumentException("Owner not found"));
         return albumRepository.findByOwner(owner);

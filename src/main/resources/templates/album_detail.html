@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${album.name} + ' - UMbook'">Detalle de Álbum</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="home-body">
+
+<div class="home-container">
+
+    <aside class="sidebar-left" th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <main class="feed">
+        <div class="album-detail-content">
+
+            <aside class="album-nav">
+                <div class="album-nav-header">
+                    <img src="https://i.pravatar.cc/40" alt="User Avatar" class="avatar small-avatar">
+                    <h3>Album</h3>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li th:each="navAlbum : ${ownerAlbums}" th:class="${navAlbum.id == album.id} ? 'active'">
+                            <a th:href="@{/albums/{id}(id=${navAlbum.id})}" th:text="${navAlbum.name}">Nombre del Álbum</a>
+                        </li>
+                    </ul>
+                </nav>
+                <a th:href="@{/albums/{id}/upload(id=${album.id})}" class="btn-primary">+ New Photo</a>
+            </aside>
+
+            <div class="album-feed">
+                <div class="album-feed-header">
+                    <h2>Photos</h2>
+                    <div class="dropdown">
+                        <button class="dropdown-toggle" id="album-options-btn"><i class="fas fa-ellipsis-h"></i></button>
+                        <div class="dropdown-menu" id="album-options-menu">
+                            <a href="#">Edit</a>
+                            <a href="#">Delete</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="photo-grid">
+                    <div th:if="${!#lists.isEmpty(album.photos)}" th:each="photo : ${album.photos}" class="photo-item">
+                        <img th:src="@{'/api/photos/' + ${photo.id} + '/data'}" alt="Foto del álbum">
+                    </div>
+                    <div th:if="${#lists.isEmpty(album.photos)}" class="empty-state">
+                        <p>This album has no photo.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <aside class="sidebar-right"></aside>
+</div>
+
+<script>
+    document.getElementById('album-options-btn').addEventListener('click', function() {
+        document.getElementById('album-options-menu').classList.toggle('visible');
+    });
+</script>
+</body>
+</html>
