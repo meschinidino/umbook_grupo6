@@ -35,18 +35,41 @@
                     <h2>Photos</h2>
                     <div class="dropdown">
                         <button class="dropdown-toggle" id="album-options-btn"><i class="fas fa-ellipsis-h"></i></button>
-                        <div class="dropdown-menu" id="album-options-menu">
+                        <div class="dropdown-menu">
                             <a href="#">Edit</a>
                             <a href="#">Delete</a>
                         </div>
                     </div>
                 </div>
-                <div class="photo-grid">
-                    <div th:if="${!#lists.isEmpty(album.photos)}" th:each="photo : ${album.photos}" class="photo-item">
-                        <img th:src="@{'/api/photos/' + ${photo.id} + '/data'}" alt="Foto del álbum">
-                    </div>
+                <div class="feed">
+                    <article th:if="${!#lists.isEmpty(album.photos)}" th:each="photo : ${album.photos}" class="post">
+
+                        <header class="post-header">
+                            <div class="user-info">
+                                <img src="https://i.pravatar.cc/50" alt="Avatar" class="avatar">
+                                <div>
+                                    <strong th:text="${photo.uploader.firstName} + ' ' + ${photo.uploader.lastName}">Jessica Alba</strong>
+                                    <span th:text="'@' + ${photo.uploader.email}">@jessicaalba</span>
+                                </div>
+                            </div>
+                            <div class="dropdown">
+                                <button class="dropdown-toggle"><i class="fas fa-ellipsis-h"></i></button>
+                                <div class="dropdown-menu">
+                                    <a href="#">Edit</a>
+                                    <a th:href="@{/photos/{photoId}/delete(photoId=${photo.id}, albumId=${album.id})}">Delete</a>
+                                </div>
+                            </div>
+                        </header>
+
+                        <div class="post-content">
+                            <img th:src="@{'/api/photos/' + ${photo.id} + '/data'}" alt="Post image" class="post-image">
+                            <p th:if="${photo.description}" th:text="${photo.description}" class="photo-description"></p>
+                        </div>
+
+                    </article>
+
                     <div th:if="${#lists.isEmpty(album.photos)}" class="empty-state">
-                        <p>This album has no photo.</p>
+                        <p>This album has no photos yet.</p>
                     </div>
                 </div>
             </div>
@@ -58,8 +81,23 @@
 </div>
 
 <script>
-    document.getElementById('album-options-btn').addEventListener('click', function() {
-        document.getElementById('album-options-menu').classList.toggle('visible');
+    // Buscamos el contenedor principal de las fotos
+    const feedContainer = document.querySelector('.album-feed .feed');
+
+    // Añadimos un solo "escuchador" de clics al contenedor
+    feedContainer.addEventListener('click', function(event) {
+
+        // Verificamos si el clic fue en un botón de menú
+        const toggleButton = event.target.closest('.dropdown-toggle');
+
+        if (toggleButton) {
+            // Encontramos el menú desplegable que está justo al lado del botón
+            const dropdownMenu = toggleButton.nextElementSibling;
+            // Mostramos u ocultamos ese menú específico
+            if (dropdownMenu) {
+                dropdownMenu.classList.toggle('visible');
+            }
+        }
     });
 </script>
 </body>

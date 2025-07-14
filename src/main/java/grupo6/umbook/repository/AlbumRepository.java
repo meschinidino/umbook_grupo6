@@ -30,4 +30,10 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
     @Query("SELECT COUNT(p) FROM Photo p WHERE p.album.id = :albumId")
     long countPhotosByAlbumId(@Param("albumId") Long albumId);
 
+    /**
+     * AÑADIDO: Nuevo método para buscar un álbum y cargar todas sus relaciones.
+     */
+    @Query("SELECT DISTINCT a FROM Album a LEFT JOIN FETCH a.photos p LEFT JOIN FETCH p.uploader WHERE a.id = :albumId")
+    Optional<Album> findByIdWithDetails(@Param("albumId") Long albumId);
+
 }

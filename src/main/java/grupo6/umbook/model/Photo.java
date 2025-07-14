@@ -23,7 +23,7 @@ public class Photo {
     private String description;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition="LONGBLOB")
     private byte[] data;
 
     @ManyToOne
@@ -138,8 +138,10 @@ public class Photo {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        // Usamos instanceof para verificar el tipo, es más seguro con proxies de Hibernate
+        if (!(o instanceof Photo)) return false;
         Photo photo = (Photo) o;
+        // La igualdad se basa en el ID si no es nulo
         return id != null && id.equals(photo.id);
     }
 

@@ -975,3 +975,15 @@ input:checked + .slider:before {
 .dropdown-menu.visible { display: block; }
 .dropdown-menu a { display: block; padding: 0.75rem 1rem; text-decoration: none; color: #333; }
 .dropdown-menu a:hover { background-color: #f0f2f5; }
+
+/* Hacemos que el contenedor del menú sea el punto de referencia para posicionar el menú */
+.post-header .dropdown {
+    position: relative;
+    margin-left: auto; /* Empuja el menú a la derecha */
+}
+
+/* Añadimos un estilo para la descripción de la foto */
+.photo-description {
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}

@@ -134,4 +134,26 @@ public class AlbumPageController {
         // Redirigimos de vuelta a la página del álbum
         return "redirect:/albums/" + albumId;
     }
+
+    /**
+     * AÑADIDO: Maneja la petición para eliminar una foto.
+     */
+    @GetMapping("/photos/{photoId}/delete")
+    public String handleDeletePhoto(
+            @PathVariable Long photoId,
+            @RequestParam Long albumId, // Necesitamos el ID del álbum para saber a dónde volver
+            Authentication authentication) {
+
+        // Obtenemos el ID del usuario que realiza la acción para la validación de permisos
+        String userEmail = authentication.getName();
+        User currentUser = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+
+        // Llamamos al servicio para que borre la foto
+        photoService.deletePhoto(photoId, currentUser.getId());
+
+        // Redirigimos de vuelta a la página del álbum actualizada
+        return "redirect:/albums/" + albumId;
+    }
+
 }

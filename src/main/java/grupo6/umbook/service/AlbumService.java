@@ -53,7 +53,8 @@ public class AlbumService {
 
     @Transactional(readOnly = true)
     public Album findById(Long albumId) {
-        return albumRepository.findById(albumId)
+        // MODIFICADO: Usamos el nuevo método para asegurar que todo se cargue.
+        return albumRepository.findByIdWithDetails(albumId)
                 .orElseThrow(() -> new IllegalArgumentException("Album not found"));
     }
 
