@@ -1,10 +1,7 @@
 package grupo6.umbook.service;
 
 import grupo6.umbook.dto.CreateAlbumRequest;
-import grupo6.umbook.model.Album;
-import grupo6.umbook.model.AlbumState;
-import grupo6.umbook.model.Group;
-import grupo6.umbook.model.User;
+import grupo6.umbook.model.*;
 import grupo6.umbook.repository.AlbumRepository;
 import grupo6.umbook.repository.GroupRepository;
 import grupo6.umbook.repository.UserRepository;
@@ -13,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -151,5 +149,26 @@ public class AlbumService {
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new IllegalArgumentException("Album not found"));
         return album.getOwner().getId().equals(userId);
+    }
+
+    /**
+     * AÑADIDO: Verifica si un usuario puede ver un álbum.
+     */
+    @Transactional(readOnly = true)
+    public boolean canUserViewAlbum(Album album, User user) {
+
+        // Si no hay un usuario logueado, no puede ver el álbum (asumimos que todos son privados por defecto).
+        if (user == null) {
+            return false;
+        }
+
+        // Opción 1: El usuario es el dueño del álbum.
+        if (album.getOwner().equals(user)) {
+            return true;
+        }
+
+        // Opción 2: El usuario es miembro de un grupo con permiso para ver.
+        // Collections.disjoint devuelve 'false' si hay al menos un elemento en común.
+        return !Collections.disjoint(user.getGroups(), album.getPermittedToView());
     }
 }

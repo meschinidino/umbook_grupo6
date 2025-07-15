@@ -56,6 +56,9 @@ public class User {
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Set<FriendRequest> sentFriendRequests = new HashSet<>();
 
+    @ManyToMany(mappedBy = "members", fetch = FetchType.LAZY)
+    private Set<Group> groups = new HashSet<>();
+
     // Constructors
     public User() {}
 
@@ -140,6 +143,13 @@ public class User {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Set<Group> getGroups() {
+        return groups;
+    }
+    public void setGroups(Set<Group> groups) {
+        this.groups = groups;
     }
 
     public Integer getBirthdayReminderDays() {

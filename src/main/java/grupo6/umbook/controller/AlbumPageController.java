@@ -102,31 +102,33 @@ public class AlbumPageController {
     }
 
     @GetMapping("/albums/{albumId}")
-    public String showAlbumDetailPage(@PathVariable Long albumId, Model model, Authentication authentication) {
+    public String showAlbumDetailPage(
+            @PathVariable Long albumId,
+            Model model,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) { // <-- Añadir RedirectAttributes
 
-        // Buscamos el álbum específico que se quiere ver
         Album currentAlbum = albumService.findById(albumId);
-        model.addAttribute("album", currentAlbum);
+        User currentUser = null;
 
-        // También buscamos todos los álbumes del usuario para la navegación lateral
         if (authentication != null && authentication.isAuthenticated()) {
-            String userEmail = authentication.getName();
-            User currentUser = userRepository.findByEmail(userEmail)
-                    .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
-            model.addAttribute("ownerAlbums", albumService.findAlbumsByOwnerId(currentUser.getId()));
+            currentUser = userRepository.findByEmail(authentication.getName())
+                    .orElse(null);
         }
 
-        model.addAttribute("activePage", "albums");
-        return "album_detail"; // Renderiza el nuevo archivo album-detail.html
-    }
+        // --- VALIDACIÓN DE PERMISOS ---
+        if (!albumService.canUserViewAlbum(currentAlbum, currentUser)) {
+            // Si no tiene permiso, lo redirigimos con un mensaje de error
+            redirectAttributes.addFlashAttribute("errorMessage", "No tienes permiso para ver este álbum.");
+            return "redirect:/albums"; // O a /home
+        }
 
-    /**
-     * AÑADIDO: Muestra el formulario para subir una nueva foto a un álbum específico.
-     */
-    @GetMapping("/albums/{albumId}/upload")
-    public String showUploadPhotoPage(@PathVariable Long albumId, Model model) {
-        model.addAttribute("albumId", albumId); // Pasamos el ID del álbum a la vista
-        return "upload_photo"; // Renderiza el nuevo archivo upload-photo.html
+        // Si tiene permiso, continuamos como antes
+        model.addAttribute("album", currentAlbum);
+        model.addAttribute("ownerAlbums", albumService.findAlbumsByOwnerId(currentAlbum.getOwner().getId()));
+        model.addAttribute("activePage", "albums");
+
+        return "album_detail";
     }
 
     /**
