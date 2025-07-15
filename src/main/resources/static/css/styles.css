@@ -996,3 +996,22 @@ input:checked + .slider:before {
     border: 1px solid #f5c6cb;
     border-radius: 4px;
 }
+
+.btn-delete-group {
+    background-color: #e74c3c; /* rojo */
+    border: none;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-delete-group:hover {
+    background-color: #c0392b;
+}
+
+.btn-delete-group i {
+    margin: 0;
+}

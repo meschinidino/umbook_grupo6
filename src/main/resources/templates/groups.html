@@ -31,6 +31,14 @@
                     <small>10+ posts a day</small>
                     <p th:text="${group.description}">Descripción del grupo...</p>
                 </div>
+                <form th:if="${currentUserEmail == group.creator.email}"
+                      th:action="@{'/groups/delete/' + ${group.id}}"
+                      method="post"
+                      onsubmit="return confirm('¿Estás seguro de eliminar este grupo?');">
+                    <button type="submit" class="btn-delete-group" title="Eliminar grupo">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </form>
                 <button class="btn-secondary-outline">Message</button>
             </div>
         </div>

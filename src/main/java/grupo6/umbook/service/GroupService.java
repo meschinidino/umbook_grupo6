@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -98,9 +99,11 @@ public class GroupService {
         return groupRepository.findGroupsByMember(user);
     }
 
-    @Transactional(readOnly = true)
     public List<Group> findPublicGroups() {
-        return groupRepository.findPublicGroups();
+        return groupRepository.findPublicGroups()
+                .stream()
+                .filter(g -> g.getState() != GroupState.ELIMINADO)
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -218,11 +221,8 @@ public class GroupService {
             throw new IllegalArgumentException("Only the creator can delete the group");
         }
 
-        // El grupo debe estar sin miembros para poder ser eliminado
-        if (group.getState() != GroupState.SIN_MIEMBROS) {
-            throw new IllegalStateException("Cannot delete a group that still has members.");
-        }
-
+        // Permitimos borrar el grupo incluso con miembros
+        group.setMembers(new HashSet<>()); // Limpiamos la lista de miembros
         group.setState(GroupState.ELIMINADO);
         groupRepository.save(group);
     }
