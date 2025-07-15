@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
 public class GroupPageController {
 
@@ -29,48 +31,54 @@ public class GroupPageController {
     }
 
     @GetMapping("/groups/create")
-    public String showCreateGroupPage(Model model) {
+    public String showCreateGroupPage(Model model, Authentication authentication) {
         model.addAttribute("groupRequest", new CreateGroupRequest());
+
+        // Obtenemos el usuario autenticado
+        String email = authentication.getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
+
+        // Filtramos al usuario autenticado de la lista
+        List<User> otherUsers = userRepository.findAll()
+                .stream()
+                .filter(user -> !user.getId().equals(currentUser.getId()))
+                .toList();
+
+        model.addAttribute("suggestedUsers", otherUsers);
+
         return "create_group";
     }
 
-    /**
-     * MODIFICADO: Ahora el método recibe el objeto Authentication
-     * para saber quién es el usuario que ha iniciado sesión.
-     */
     @PostMapping("/groups/create")
-    public String handleCreateGroup(@ModelAttribute CreateGroupRequest groupRequest, Authentication authentication, Model model) {
+    public String handleCreateGroup(@ModelAttribute CreateGroupRequest groupRequest,
+                                    @RequestParam(value = "memberIds", required = false) List<Long> memberIds,
+                                    Authentication authentication,
+                                    Model model) {
 
-        // ... (la lógica para obtener el 'creator' se queda igual)
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
+
         String userEmail = authentication.getName();
         User creator = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new IllegalStateException("Authenticated user not found."));
 
         try {
-            // Intentamos crear el grupo
-            groupService.createGroup(groupRequest, creator.getId());
-
-            // Si todo va bien, redirigimos a la lista de grupos
+            groupService.createGroup(groupRequest, creator.getId(), memberIds);
             return "redirect:/groups";
 
         } catch (IllegalArgumentException e) {
-            // Si atrapamos un error...
             if (e.getMessage().contains("Group name already exists")) {
-                // Añadimos el mensaje de error y los datos ya escritos al modelo
                 model.addAttribute("errorMessage", "The group name cannot be repeated. Please enter a valid name.");
-                model.addAttribute("groupRequest", groupRequest); // Esto repuebla el formulario
-
-                // Devolvemos la misma vista del formulario en lugar de redirigir
+                model.addAttribute("groupRequest", groupRequest);
                 return "create_group";
             }
 
-            // Para cualquier otro error, podrías manejarlo de otra forma
             model.addAttribute("errorMessage", "Ocurrió un error inesperado.");
             model.addAttribute("groupRequest", groupRequest);
             return "create_group";
         }
     }
+
 }

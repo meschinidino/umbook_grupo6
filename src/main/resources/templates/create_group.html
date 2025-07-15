@@ -61,23 +61,12 @@
                     </div>
                     <h4 class="suggested-title">Suggested</h4>
                     <ul class="members-list" id="suggested-members-list">
-                        <li class="member-item" data-userid="1">
+                        <li class="member-item" th:each="user : ${suggestedUsers}" th:attr="data-userid=${user.id}">
                             <div class="member-info">
-                                <img src="https://i.pravatar.cc/40?img=4" alt="Avatar" class="avatar small-avatar">
+                                <img th:src="'https://i.pravatar.cc/40?u=' + ${user.id}" alt="Avatar" class="avatar small-avatar">
                                 <div class="user-details">
-                                    <strong>Zada Jackson</strong>
-                                    <span>@zadajackson</span>
-                                </div>
-                                <i class="fas fa-check-circle verified-check"></i>
-                            </div>
-                            <button type="button" class="btn-primary add-btn">Add</button>
-                        </li>
-                        <li class="member-item" data-userid="2">
-                            <div class="member-info">
-                                <img src="https://i.pravatar.cc/40?img=5" alt="Avatar" class="avatar small-avatar">
-                                <div class="user-details">
-                                    <strong>Craig Saris</strong>
-                                    <span>@craigsaris</span>
+                                    <strong th:text="${user.firstName + ' ' + user.lastName}"></strong>
+                                    <span th:text="'@' + ${user.email.split('@')[0]}"></span>
                                 </div>
                                 <i class="fas fa-check-circle verified-check"></i>
                             </div>
@@ -90,6 +79,9 @@
                     <h4 class="members-title">Members</h4>
                     <ul class="members-list" id="current-members-list">
                     </ul>
+                    <!-- Contenedor oculto para inputs con los IDs de miembros seleccionados -->
+                    <div id="selected-members-inputs"></div>
+
                 </div>
 
                 <div id="add-permissions-section">
@@ -143,7 +135,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-        // Obtenemos todos los elementos que vamos a manipular
+        // Obtenemos los elementos relevantes
         const addMembersLink = document.getElementById('add-members-link');
         const seeMembersLink = document.getElementById('see-members-link');
         const addPermissionsLink = document.getElementById('add-permissions-link');
@@ -154,10 +146,9 @@
 
         const suggestedList = document.getElementById('suggested-members-list');
         const currentMembersList = document.getElementById('current-members-list');
+        const selectedInputsContainer = document.getElementById('selected-members-inputs');
 
-        // --- LÓGICA PARA MOSTRAR/OCULTAR SECCIONES ---
-
-        // Al hacer clic en "+ Add Members"
+        // Mostrar/Ocultar secciones
         addMembersLink.addEventListener('click', function(e) {
             e.preventDefault();
             suggestedSection.classList.add('visible');
@@ -165,7 +156,6 @@
             permissionsSection.classList.remove('visible');
         });
 
-        // Al hacer clic en "+ See Members"
         seeMembersLink.addEventListener('click', function(e) {
             e.preventDefault();
             currentMembersSection.classList.add('visible');
@@ -173,7 +163,6 @@
             permissionsSection.classList.remove('visible');
         });
 
-        // Al hacer clic en "+ Add Permissions?"
         addPermissionsLink.addEventListener('click', function(e) {
             e.preventDefault();
             permissionsSection.classList.add('visible');
@@ -181,14 +170,13 @@
             currentMembersSection.classList.remove('visible');
         });
 
-
-        // --- LÓGICA PARA AÑADIR Y QUITAR MIEMBROS ---
-
-        // Evento para los botones de "Add"
+        // Agregar miembro
         suggestedList.addEventListener('click', function(e) {
             if (e.target.classList.contains('add-btn')) {
                 const memberItem = e.target.closest('.member-item');
                 if (!memberItem) return;
+
+                const userId = memberItem.dataset.userid;
 
                 seeMembersLink.classList.remove('hidden-link');
                 memberItem.style.display = 'none';
@@ -200,19 +188,32 @@
                 button.classList.add('remove-btn');
 
                 currentMembersList.appendChild(newMemberItem);
+
+                // Crear input hidden con el userId
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'memberIds';
+                hiddenInput.value = userId;
+                hiddenInput.setAttribute('data-userid', userId);
+                selectedInputsContainer.appendChild(hiddenInput);
             }
         });
 
-        // Evento para los botones de "Remove"
+        // Quitar miembro
         currentMembersList.addEventListener('click', function(e) {
             if (e.target.classList.contains('remove-btn')) {
                 const itemToRemove = e.target.closest('.member-item');
                 const userId = itemToRemove.dataset.userid;
 
+                // Mostrar nuevamente en la lista sugerida
                 const originalItem = suggestedList.querySelector(`.member-item[data-userid="${userId}"]`);
                 if (originalItem) {
                     originalItem.style.display = 'flex';
                 }
+
+                // Remover input hidden asociado
+                const hiddenInput = selectedInputsContainer.querySelector(`input[data-userid="${userId}"]`);
+                if (hiddenInput) hiddenInput.remove();
 
                 itemToRemove.remove();
 
@@ -220,6 +221,25 @@
                     currentMembersSection.classList.remove('visible');
                     seeMembersLink.classList.add('hidden-link');
                 }
+            }
+        });
+
+        // Validación antes de enviar el formulario
+        const form = document.querySelector('.create-group-form');
+
+        form.addEventListener('submit', function (e) {
+            const currentMembers = currentMembersList.querySelectorAll('.member-item');
+
+            if (currentMembers.length === 0) {
+                e.preventDefault(); // Evita que se envíe
+
+                let errorDiv = document.querySelector('.form-error-message');
+                if (!errorDiv) {
+                    errorDiv = document.createElement('div');
+                    errorDiv.classList.add('alert', 'alert-danger', 'form-error-message');
+                    form.insertBefore(errorDiv, form.firstChild);
+                }
+                errorDiv.textContent = "Debes agregar al menos un miembro además de ti mismo.";
             }
         });
     });

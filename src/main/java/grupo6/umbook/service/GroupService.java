@@ -51,9 +51,31 @@ public class GroupService {
         if (request.getPostPermission() != null) {
             group.setPostPermission(GroupPermission.valueOf(request.getPostPermission().toUpperCase()));
         }
-        // ... y así con los otros permisos si los tenés en el DTO ...
+
+        if (group.getMembers().isEmpty()) {
+            throw new IllegalArgumentException("Group must have at least one member.");
+        }
 
         return groupRepository.save(group);
+    }
+
+    // NUEVO método: llamado desde el formulario web
+    @Transactional
+    public Group createGroup(CreateGroupRequest request, Long creatorId, List<Long> memberIds) {
+        Group group = createGroup(request, creatorId); // Reutiliza la lógica del original
+
+        if (memberIds != null) {
+            for (Long userId : memberIds) {
+                if (!userId.equals(creatorId)) {
+                    User user = userRepository.findById(userId)
+                            .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+                    group.addMember(user);
+                }
+            }
+            groupRepository.save(group);
+        }
+
+        return group;
     }
 
     @Transactional(readOnly = true)
