@@ -37,7 +37,18 @@ public class AlbumService {
     public Album createAlbum(CreateAlbumRequest request, Long ownerId) {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new IllegalArgumentException("Owner not found"));
-        Album album = new Album(request.getName(), request.getDescription(), owner);
+
+        String name = request.getName();
+        String description = request.getDescription();
+
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Album name cannot be empty.");
+        }
+        if (albumRepository.existsByNameAndOwner(name, owner)) {
+            throw new IllegalArgumentException("You already have an album with that name.");
+        }
+
+        Album album = new Album(name, description, owner);
 
         if (request.getViewPermissionGroupIds() != null) {
             List<Group> viewGroups = groupRepository.findAllById(request.getViewPermissionGroupIds());

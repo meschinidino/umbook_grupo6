@@ -41,6 +41,9 @@
                         <input type="file" id="profile-photo" name="profilePhoto" class="file-upload-input">
                     </div>
                     <div class="group-name-wrapper">
+                        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">
+                            Mensaje de error va aquí
+                        </div>
                         <label for="album-name">Album Name</label>
                         <input type="text" id="album-name" th:field="*{name}" placeholder="Write here..." required>
                     </div>

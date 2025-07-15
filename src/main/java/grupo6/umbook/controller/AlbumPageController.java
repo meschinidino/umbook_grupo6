@@ -72,7 +72,8 @@ public class AlbumPageController {
      * Procesa los datos del formulario para crear un nuevo álbum.
      */
     @PostMapping("/albums/create")
-    public String handleCreateAlbum(@ModelAttribute CreateAlbumRequest albumRequest, Authentication authentication) {
+    public String handleCreateAlbum(@ModelAttribute CreateAlbumRequest albumRequest, Authentication authentication, Model model) {
+
         if (authentication == null || !authentication.isAuthenticated()) {
             return "redirect:/login";
         }
@@ -80,10 +81,24 @@ public class AlbumPageController {
         User creator = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new IllegalStateException("Usuario logueado no encontrado."));
 
-        // Llamamos al servicio para crear el álbum con los datos del DTO
-        albumService.createAlbum(albumRequest, creator.getId());
+        try {
+            // Intentamos crear el álbum
+            albumService.createAlbum(albumRequest, creator.getId());
+            // Si todo va bien, redirigimos
+            return "redirect:/albums";
 
-        return "redirect:/albums";
+        } catch (IllegalArgumentException e) {
+            // Si ocurre un error de validación (como nombre repetido)...
+            // Añadimos el mensaje de error que viene del servicio
+            model.addAttribute("errorMessage", e.getMessage());
+            // Añadimos el objeto de la petición para repoblar el formulario
+            model.addAttribute("albumRequest", albumRequest);
+            // Buscamos de nuevo los grupos del usuario para mostrarlos en la lista
+            model.addAttribute("userGroups", groupService.findGroupsByMember(creator.getId()));
+
+            // Devolvemos la misma vista del formulario en lugar de redirigir
+            return "create_album";
+        }
     }
 
     @GetMapping("/albums/{albumId}")
