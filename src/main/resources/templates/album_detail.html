@@ -33,14 +33,8 @@
             <div class="album-feed">
                 <div class="album-feed-header">
                     <h2>Photos</h2>
-                    <div class="dropdown">
-                        <button class="dropdown-toggle" id="album-options-btn"><i class="fas fa-ellipsis-h"></i></button>
-                        <div class="dropdown-menu">
-                            <a href="#">Edit</a>
-                            <a href="#">Delete</a>
-                        </div>
-                    </div>
                 </div>
+
                 <div class="feed">
                     <article th:if="${!#lists.isEmpty(album.photos)}" th:each="photo : ${album.photos}" class="post">
 
@@ -56,7 +50,11 @@
                                 <button class="dropdown-toggle"><i class="fas fa-ellipsis-h"></i></button>
                                 <div class="dropdown-menu">
                                     <a href="#">Edit</a>
-                                    <a th:href="@{/photos/{photoId}/delete(photoId=${photo.id}, albumId=${album.id})}">Delete</a>
+                                    <a th:href="@{/photos/{photoId}/delete(photoId=${photo.id}, albumId=${album.id})}"
+                                       onclick="return confirm('Are you sure you want to delete this photo?');">
+                                        Delete
+                                    </a>
+
                                 </div>
                             </div>
                         </header>
@@ -81,19 +79,12 @@
 </div>
 
 <script>
-    // Buscamos el contenedor principal de las fotos
     const feedContainer = document.querySelector('.album-feed .feed');
 
-    // Añadimos un solo "escuchador" de clics al contenedor
     feedContainer.addEventListener('click', function(event) {
-
-        // Verificamos si el clic fue en un botón de menú
         const toggleButton = event.target.closest('.dropdown-toggle');
-
         if (toggleButton) {
-            // Encontramos el menú desplegable que está justo al lado del botón
             const dropdownMenu = toggleButton.nextElementSibling;
-            // Mostramos u ocultamos ese menú específico
             if (dropdownMenu) {
                 dropdownMenu.classList.toggle('visible');
             }
