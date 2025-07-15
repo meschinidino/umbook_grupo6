@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -24,7 +25,7 @@ public class AlbumPageController {
     private AlbumService albumService;
 
     @Autowired
-    private GroupService groupService; // Inyectamos el servicio de grupos
+    private GroupService groupService;
 
     @Autowired
     private UserRepository userRepository;
@@ -121,17 +122,24 @@ public class AlbumPageController {
             @PathVariable Long albumId,
             @RequestParam("file") MultipartFile file,
             @RequestParam("description") String description,
-            Authentication authentication) throws IOException {
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) { // <-- Añadir RedirectAttributes
 
-        // Obtenemos el ID del usuario que sube la foto
-        String userEmail = authentication.getName();
-        User uploader = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+        try {
+            String userEmail = authentication.getName();
+            User uploader = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
 
-        // Llamamos al servicio que ya tenías para subir la foto
-        photoService.uploadPhoto(file, description, albumId, uploader.getId());
+            photoService.uploadPhoto(file, description, albumId, uploader.getId());
 
-        // Redirigimos de vuelta a la página del álbum
+        } catch (IllegalArgumentException | IOException e) {
+            // Si ocurre un error, añadimos el mensaje para mostrarlo en el frontend
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            // Y redirigimos de vuelta a la página de subida
+            return "redirect:/albums/" + albumId + "/upload";
+        }
+
+        // Si todo va bien, redirigimos a la página del álbum
         return "redirect:/albums/" + albumId;
     }
 

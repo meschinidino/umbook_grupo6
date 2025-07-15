@@ -50,7 +50,7 @@ public class PhotoService {
             throw new IllegalArgumentException("Only the album owner can upload photos");
         }
         if (photoRepository.existsByAlbumIdAndFileName(albumId, file.getOriginalFilename())) {
-            throw new IllegalArgumentException("Photo with this name already exists in the album");
+            throw new IllegalArgumentException("PThis photo already exists in this album");
         }
 
         Photo photo = new Photo(file.getOriginalFilename(), file.getContentType(), file.getBytes(), uploader);

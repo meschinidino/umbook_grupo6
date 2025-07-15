@@ -19,6 +19,9 @@
 
             <form th:action="@{/albums/{id}/upload(id=${albumId})}" method="post" enctype="multipart/form-data" class="creation-form">
 
+                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">
+                    Mensaje de error va aquí
+                </div>
                 <div class="form-section">
                     <label for="file-upload">Seleccionar Archivo</label>
                     <input type="file" id="file-upload" name="file" required class="form-control-file">
