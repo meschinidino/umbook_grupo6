@@ -22,7 +22,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     @Query("SELECT g FROM Group g WHERE :user MEMBER OF g.members")
     List<Group> findGroupsByMember(@Param("user") User user);
 
-    @Query("SELECT g FROM Group g WHERE g.visibility = grupo6.umbook.model.GroupVisibility.PUBLIC")
+    @Query("SELECT g FROM Group g JOIN FETCH g.creator WHERE g.visibility = 'PUBLIC'")
     List<Group> findPublicGroups();
 
     @Query("SELECT g FROM Group g WHERE LOWER(g.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(g.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")

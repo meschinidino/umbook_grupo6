@@ -1,6 +1,7 @@
 package grupo6.umbook.controller;
 
 import grupo6.umbook.dto.CreateGroupRequest;
+import grupo6.umbook.model.Group;
 import grupo6.umbook.model.User;
 import grupo6.umbook.repository.UserRepository;
 import grupo6.umbook.service.GroupService;
@@ -24,12 +25,18 @@ public class GroupPageController {
 
     @GetMapping("/groups")
     public String showGroupsPage(Model model, Authentication authentication) {
+
+        // Esto ya lo tenías, y está bien
         model.addAttribute("groups", groupService.findPublicGroups());
 
+        // AÑADIDO: Obtenemos el email del usuario actual y lo pasamos a la vista
         if (authentication != null && authentication.isAuthenticated()) {
+            // authentication.getName() devuelve el username, que en nuestro caso es el email
             model.addAttribute("currentUserEmail", authentication.getName());
+        } else {
+            // En caso de que no haya nadie logueado, pasamos un valor nulo
+            model.addAttribute("currentUserEmail", null);
         }
-
         return "groups";
     }
 
@@ -102,5 +109,21 @@ public class GroupPageController {
         return "redirect:/groups";
     }
 
+    /**
+     * AÑADIDO: Muestra la página de detalle de un grupo específico.
+     */
+    @GetMapping("/groups/{groupId}")
+    public String showGroupDetailPage(@PathVariable Long groupId, Model model, Authentication authentication) {
 
+        Group currentGroup = groupService.findById(groupId);
+        model.addAttribute("group", currentGroup);
+        model.addAttribute("activePage", "groups");
+
+        // AÑADIDO: Pasamos el email del usuario actual a la vista
+        if (authentication != null && authentication.isAuthenticated()) {
+            model.addAttribute("currentUserEmail", authentication.getName());
+        }
+
+        return "group_detail";
+    }
 }

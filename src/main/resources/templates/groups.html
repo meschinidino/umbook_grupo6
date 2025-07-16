@@ -24,23 +24,27 @@
         </div>
 
         <div class="group-list">
-            <div th:each="group : ${groups}" class="group-item">
+            <a th:each="group : ${groups}" th:href="@{/groups/{id}(id=${group.id})}" class="group-item">
+
                 <img th:src="@{/images/default-group.png}" alt="Avatar del Grupo" class="group-avatar">
                 <div class="group-info">
                     <h3 th:text="${group.name}">Nombre del Grupo</h3>
                     <small>10+ posts a day</small>
                     <p th:text="${group.description}">Descripción del grupo...</p>
                 </div>
-                <form th:if="${currentUserEmail == group.creator.email}"
-                      th:action="@{'/groups/delete/' + ${group.id}}"
-                      method="post"
-                      onsubmit="return confirm('¿Estás seguro de eliminar este grupo?');">
-                    <button type="submit" class="btn-delete-group" title="Eliminar grupo">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </form>
-                <button class="btn-secondary-outline">Message</button>
-            </div>
+
+                <div class="group-item-actions" onclick="event.stopPropagation();">
+                    <form th:if="${currentUserEmail == group.creator.email}"
+                          th:action="@{'/groups/delete/' + ${group.id}}"
+                          method="post"
+                          onsubmit="return confirm('¿Estás seguro de eliminar este grupo?');">
+                        <button type="submit" class="btn-delete-group" title="Eliminar grupo">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                    <button class="btn-secondary-outline">Message</button>
+                </div>
+            </a>
         </div>
     </main>
 
