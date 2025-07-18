@@ -45,10 +45,6 @@ public class GroupService {
 
         Group group = new Group(name, description, creator);
 
-        // Aquí también establecemos los permisos que vienen en el DTO
-        if (request.getVisibility() != null) {
-            group.setVisibility(GroupVisibility.valueOf(request.getVisibility().toUpperCase()));
-        }
         if (request.getPostPermission() != null) {
             group.setPostPermission(GroupPermission.valueOf(request.getPostPermission().toUpperCase()));
         }

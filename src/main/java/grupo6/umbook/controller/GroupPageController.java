@@ -42,14 +42,20 @@ public class GroupPageController {
 
     @GetMapping("/groups/create")
     public String showCreateGroupPage(Model model, Authentication authentication) {
-        model.addAttribute("groupRequest", new CreateGroupRequest());
+        CreateGroupRequest groupRequest = new CreateGroupRequest();
+
+        // Establecer valores vacíos para que se muestre "Elegir..." en el select
+        groupRequest.setPostPermission("");
+        groupRequest.setCommentPermission("");
+        groupRequest.setInvitePermission("");
+
+        model.addAttribute("groupRequest", groupRequest);
 
         // Obtenemos el usuario autenticado
         String email = authentication.getName();
         User currentUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
 
-        // Filtramos al usuario autenticado de la lista
         List<User> otherUsers = userRepository.findAll()
                 .stream()
                 .filter(user -> !user.getId().equals(currentUser.getId()))

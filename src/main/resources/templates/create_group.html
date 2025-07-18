@@ -89,39 +89,26 @@
                         <h4>Group Permissions</h4>
 
                         <div class="permission-row">
-                            <label>Visibilidad del grupo</label>
-                            <div class="radio-group">
-                                <input type="radio" id="vis-private" th:field="*{visibility}" value="PRIVATE">
-                                <label for="vis-private">Privado</label>
-                                <input type="radio" id="vis-public" th:field="*{visibility}" value="PUBLIC" th:checked="true">
-                                <label for="vis-public">Público</label>
-                            </div>
-                        </div>
-
-                        <div class="permission-row">
                             <label for="post-permission">Postear</label>
-                            <select id="post-permission" th:field="*{postPermission}">
-                                <option value="ALL">Todos</option>
-                                <option value="MEMBERS_ONLY" selected>Solo miembros</option>
-                                <option value="ADMIN_ONLY">Nadie (Solo Admins)</option>
+                            <select id="post-permission" th:field="*{postPermission}" required>
+                                <option value="" selected disabled>Elegir...</option>
+                                <option value="MEMBERS_ONLY">Solo miembros</option> <option value="ADMIN_ONLY">Nadie (Solo Admins)</option>
                             </select>
                         </div>
 
                         <div class="permission-row">
                             <label for="comment-permission">Comentar</label>
-                            <select id="comment-permission" th:field="*{commentPermission}">
-                                <option value="ALL">Todos</option>
-                                <option value="MEMBERS_ONLY" selected>Solo miembros</option>
-                                <option value="ADMIN_ONLY">Nadie (Solo Admins)</option>
+                            <select id="comment-permission" th:field="*{commentPermission}" required>
+                                <option value="" selected disabled>Elegir...</option>
+                                <option value="MEMBERS_ONLY">Solo miembros</option> <option value="ADMIN_ONLY">Nadie (Solo Admins)</option>
                             </select>
                         </div>
 
                         <div class="permission-row">
                             <label for="invite-permission">Invitar a otros</label>
-                            <select id="invite-permission" th:field="*{invitePermission}">
-                                <option value="ALL">Todos</option>
-                                <option value="MEMBERS_ONLY" selected>Solo miembros</option>
-                                <option value="ADMIN_ONLY">Nadie (Solo Admins)</option>
+                            <select id="invite-permission" th:field="*{invitePermission}" required>
+                                <option value="" selected disabled>Elegir...</option>
+                                <option value="MEMBERS_ONLY">Solo miembros</option> <option value="ADMIN_ONLY">Nadie (Solo Admins)</option>
                             </select>
                         </div>
                     </div>
