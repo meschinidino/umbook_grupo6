@@ -1,81 +1,87 @@
-# umbook_grupo6
+# 📷 UMbook - Aplicación de Red Social
 
-## Database Configuration
+UMbook es una aplicación web de red social construida con **Spring Boot**, **Thymeleaf**, **Spring Security** y **MySQL**. Permite a los usuarios registrarse, gestionar amigos, crear grupos y compartir álbumes de fotos.
 
-For a detailed explanation of how the database is created and set up in this application, see [Database Setup Explanation](src/main/resources/db_setup_explanation.md).
+---
 
-### Current Configuration: H2 In-Memory Database
+## ✨ Características Principales
 
-The application is currently configured to use an H2 in-memory database for development and testing purposes. This allows the application to run without requiring an external MySQL database.
+### 🔐 Autenticación de Usuarios
+- Sistema completo de registro e inicio de sesión.
+- Contraseñas encriptadas.
+- Integración con Spring Security.
 
-### H2 Console
+### 👥 Gestión de Grupos
+- Crear grupos con nombre, descripción y permisos.
+- Ciclo de vida del grupo:
+    - `Activo`: grupo funcional con miembros.
+    - `Sin Miembros`: grupo sin participantes.
+    - `Eliminado`: grupo marcado como inactivo.
+- Agregar y visualizar miembros de un grupo.
+- Control de permisos para:
+    - Quién puede postear.
+    - Quién puede comentar.
+    - Quién puede invitar a otros usuarios.
 
-You can access the H2 console at: http://localhost:8080/h2-console
+### 🖼️ Gestión de Álbumes de Fotos
+- Crear álbumes personalizados con nombre y descripción.
+- Subida de fotos a cada álbum.
+- Ciclo de vida del álbum:
+    - `Vacío`: sin fotos.
+    - `Con Fotos`: contiene imágenes.
+    - `Eliminado`: marcado como inactivo.
+- Permisos por grupo para visualizar o comentar en los álbumes.
 
-Connection details:
-- JDBC URL: `jdbc:h2:mem:umbook`
-- Username: `sa`
-- Password: (empty)
+### 🤝 Sistema de Amigos
+- Solicitudes de amistad entre usuarios.
+- Aceptación y eliminación de amistades.
 
-### Switching to MySQL
+---
 
-If you want to use MySQL instead of H2, follow these steps:
+## 🚀 Cómo Ejecutar la Aplicación
 
-1. Ensure MySQL is installed and running on your machine
-2. Create a database named `umbook` (or update the configuration to use a different database name)
-3. Update `application.properties` to use MySQL:
+### 1. Clonar el repositorio
+\`\`\`bash
+git clone https://github.com/tu_usuario/umbook.git
+cd umbook
+\`\`\`
 
-```properties
-# MySQL Configuration
-spring.datasource.url=jdbc:mysql://localhost:3306/umbook?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
-spring.datasource.username=root
-spring.datasource.password=root
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+### 2. Configurar la base de datos
+Asegurate de tener un servidor **MySQL** activo y accesible.
 
-# Comment out or remove the H2 configuration
-# spring.datasource.url=jdbc:h2:mem:umbook;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-# spring.datasource.username=sa
-# spring.datasource.password=
-# spring.datasource.driver-class-name=org.h2.Driver
-# spring.h2.console.enabled=true
-# spring.h2.console.path=/h2-console
-```
+### 3. Editar el archivo \`application.properties\`
+Ubicado en \`src/main/resources/application.properties\`, modificá con tus credenciales de MySQL.
 
-## Troubleshooting
+\`\`\`properties
+# --- Configuración de MySQL ---
+spring.datasource.url=jdbc:mysql://localhost:3306/umbook_db?createDatabaseIfNotExist=true
+spring.datasource.username=tu_usuario
+spring.datasource.password=tu_contraseña
 
-### MySQL Connection Issues
 
-If you encounter MySQL connection issues like:
+# --- Configuración para subida de archivos ---
+server.tomcat.max-parameter-count=10000
+spring.servlet.multipart.max-file-size=10MB
+\`\`\`
 
-```
-Communications link failure
-Connection refused: getsockopt
-```
+### 4. Ejecutar la aplicación
+Desde tu IDE o por consola con Maven:
+\`\`\`bash
+./gradlew bootRun
+\`\`\`
 
-Check the following:
+### 5. Acceder a la aplicación
+Abrí tu navegador en:  
+http://localhost:8080
 
-1. Ensure MySQL is running on your machine
-2. Verify the MySQL port (default is 3306)
-3. Check that the username and password in `application.properties` match your MySQL configuration
-4. Make sure the database exists or `createDatabaseIfNotExist=true` is set in the connection URL
+---
 
-## Recent Changes
+## 🧱 Tecnologías Utilizadas
 
-### Birthday Notification Feature
+- **Java 21**
+- **Spring Boot**
+- **Spring Security**
+- **Thymeleaf**
+- **MySQL**
 
-The application includes a feature to notify users about their friends' birthdays. This feature works as follows:
-
-1. Users can set a reminder for birthdays by specifying how many days in advance they want to be notified
-2. The system checks for upcoming birthdays and creates notifications for users
-
-#### Implementation Details
-
-The birthday notification feature was recently updated to improve database compatibility:
-
-- The complex JPQL query in `UserRepository.findUsersWithBirthdayInNextDays` was replaced with a simpler approach
-- Birthday filtering now happens in the service layer instead of at the database level
-- This change ensures compatibility with both H2 and MySQL databases
-- The implementation handles edge cases like month boundaries and year boundaries
-
-This approach provides better maintainability and database portability while preserving the same functionality.
+---
