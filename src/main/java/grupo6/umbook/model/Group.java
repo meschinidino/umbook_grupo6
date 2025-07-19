@@ -13,7 +13,7 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Column(length = 1000)
@@ -43,13 +43,13 @@ public class Group {
     private GroupVisibility visibility = GroupVisibility.PUBLIC;
 
     @Enumerated(EnumType.STRING)
-    private GroupPermission postPermission = GroupPermission.ALL;
+    private GroupPermission postPermission = GroupPermission.MEMBERS_ONLY;
 
     @Enumerated(EnumType.STRING)
-    private GroupPermission commentPermission = GroupPermission.ALL;
+    private GroupPermission commentPermission = GroupPermission.MEMBERS_ONLY;
 
     @Enumerated(EnumType.STRING)
-    private GroupPermission invitePermission = GroupPermission.ALL;
+    private GroupPermission invitePermission = GroupPermission.MEMBERS_ONLY;
 
     // Constructores
     public Group() {

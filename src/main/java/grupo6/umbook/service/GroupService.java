@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -37,17 +38,27 @@ public class GroupService {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Group name cannot be empty");
         }
-        if (groupRepository.existsByName(name)) {
+
+        Optional<Group> existingGroupOpt = groupRepository.findByName(name);
+        if (existingGroupOpt.isPresent() && existingGroupOpt.get().getState() != GroupState.ELIMINADO) {
             throw new IllegalArgumentException("Group name already exists");
         }
+
+        // 🚨 Validaciones de permisos
+        if (request.getPostPermission() == null || request.getPostPermission().isBlank()
+                || request.getCommentPermission() == null || request.getCommentPermission().isBlank()
+                || request.getInvitePermission() == null || request.getInvitePermission().isBlank()) {
+            throw new IllegalArgumentException("All permissions must be selected before creating the group.");
+        }
+
         User creator = userRepository.findById(creatorId)
                 .orElseThrow(() -> new IllegalArgumentException("Creator not found"));
 
         Group group = new Group(name, description, creator);
 
-        if (request.getPostPermission() != null) {
-            group.setPostPermission(GroupPermission.valueOf(request.getPostPermission().toUpperCase()));
-        }
+        group.setPostPermission(GroupPermission.valueOf(request.getPostPermission().toUpperCase()));
+        group.setCommentPermission(GroupPermission.valueOf(request.getCommentPermission().toUpperCase()));
+        group.setInvitePermission(GroupPermission.valueOf(request.getInvitePermission().toUpperCase()));
 
         if (group.getMembers().isEmpty()) {
             throw new IllegalArgumentException("Group must have at least one member.");
@@ -59,20 +70,39 @@ public class GroupService {
     // NUEVO método: llamado desde el formulario web
     @Transactional
     public Group createGroup(CreateGroupRequest request, Long creatorId, List<Long> memberIds) {
-        Group group = createGroup(request, creatorId); // Reutiliza la lógica del original
+        String name = request.getName();
+        String description = request.getDescription();
 
-        if (memberIds != null) {
-            for (Long userId : memberIds) {
-                if (!userId.equals(creatorId)) {
-                    User user = userRepository.findById(userId)
-                            .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
-                    group.addMember(user);
-                }
-            }
-            groupRepository.save(group);
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del grupo no puede estar vacío.");
         }
 
-        return group;
+        // CORREGIDO: Usamos el nuevo método para validar solo contra grupos activos
+        if (groupRepository.existsByNameAndStateNot(name, GroupState.ELIMINADO)) {
+            throw new IllegalArgumentException("Ya tienes un grupo activo con este nombre.");
+        }
+
+        if (memberIds == null || memberIds.isEmpty()) {
+            throw new IllegalArgumentException("Debes agregar al menos un miembro al grupo.");
+        }
+
+        User creator = userRepository.findById(creatorId)
+                .orElseThrow(() -> new IllegalArgumentException("Creator not found"));
+
+        Group group = new Group(name, description, creator);
+
+        // Asignamos permisos
+        if (request.getPostPermission() != null) group.setPostPermission(GroupPermission.valueOf(request.getPostPermission().toUpperCase()));
+        if (request.getCommentPermission() != null) group.setCommentPermission(GroupPermission.valueOf(request.getCommentPermission().toUpperCase()));
+        if (request.getInvitePermission() != null) group.setInvitePermission(GroupPermission.valueOf(request.getInvitePermission().toUpperCase()));
+
+        // Añadimos miembros
+        if (memberIds != null && !memberIds.isEmpty()) {
+            List<User> newMembers = userRepository.findAllById(memberIds);
+            group.getMembers().addAll(newMembers);
+        }
+
+        return groupRepository.save(group);
     }
 
     @Transactional(readOnly = true)
@@ -95,11 +125,10 @@ public class GroupService {
         return groupRepository.findGroupsByMember(user);
     }
 
+    @Transactional(readOnly = true)
     public List<Group> findPublicGroups() {
-        return groupRepository.findPublicGroups()
-                .stream()
-                .filter(g -> g.getState() != GroupState.ELIMINADO)
-                .toList();
+        // CORREGIDO: Ahora simplemente devuelve el resultado de la consulta mejorada
+        return groupRepository.findPublicGroups();
     }
 
     @Transactional(readOnly = true)

@@ -1,6 +1,7 @@
 package grupo6.umbook.repository;
 
 import grupo6.umbook.model.Group;
+import grupo6.umbook.model.GroupState;
 import grupo6.umbook.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,7 +23,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     @Query("SELECT g FROM Group g WHERE :user MEMBER OF g.members")
     List<Group> findGroupsByMember(@Param("user") User user);
 
-    @Query("SELECT g FROM Group g JOIN FETCH g.creator WHERE g.visibility = 'PUBLIC'")
+    @Query("SELECT g FROM Group g JOIN FETCH g.creator WHERE g.visibility = 'PUBLIC' AND g.state <> 'ELIMINADO'")
     List<Group> findPublicGroups();
 
     @Query("SELECT g FROM Group g WHERE LOWER(g.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(g.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
@@ -30,4 +31,10 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     @Query("SELECT CASE WHEN COUNT(g) > 0 THEN true ELSE false END FROM Group g WHERE g.id = :groupId AND :user MEMBER OF g.members")
     boolean isUserMemberOfGroup(@Param("groupId") Long groupId, @Param("user") User user);
+
+    @Query("SELECT g FROM Group g WHERE g.name = :name AND g.state <> 'ELIMINADO'")
+    Optional<Group> findActiveByName(@Param("name") String name);
+
+    boolean existsByNameAndStateNot(String name, GroupState state);
+
 }

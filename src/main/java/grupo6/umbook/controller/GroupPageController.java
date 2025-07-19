@@ -85,19 +85,22 @@ public class GroupPageController {
             return "redirect:/groups";
 
         } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("Group name already exists")) {
+            String msg = e.getMessage();
+
+            if (msg.contains("Group name already exists")) {
                 model.addAttribute("errorMessage", "The group name cannot be repeated. Please enter a valid name.");
-                model.addAttribute("groupRequest", groupRequest);
-                return "create_group";
+            } else if (msg.contains("permisos") || msg.contains("permissions")) {
+                model.addAttribute("errorMessage", "Debes seleccionar todos los permisos del grupo.");
+            } else {
+                model.addAttribute("errorMessage", "Ocurrió un error inesperado.");
             }
 
-            model.addAttribute("errorMessage", "Ocurrió un error inesperado.");
             model.addAttribute("groupRequest", groupRequest);
             return "create_group";
         }
     }
 
-    @PostMapping("/groups/delete/{groupId}")
+        @PostMapping("/groups/delete/{groupId}")
     public String deleteGroupWeb(@PathVariable Long groupId,
                                  Authentication authentication,
                                  RedirectAttributes redirectAttributes) {
