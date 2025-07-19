@@ -250,7 +250,6 @@ public class GroupService {
 
     @Transactional
     public Group setGroupPermissions(Long groupId, Long userId,
-                                     GroupVisibility visibility,
                                      GroupPermission postPermission,
                                      GroupPermission commentPermission,
                                      GroupPermission invitePermission) {
@@ -263,9 +262,8 @@ public class GroupService {
             throw new IllegalArgumentException("Only the creator can set group permissions");
         }
 
-        if (visibility != null) {
-            group.setVisibility(visibility);
-        }
+        // El bloque "if (visibility != null)" se elimina por completo
+
         if (postPermission != null) {
             group.setPostPermission(postPermission);
         }

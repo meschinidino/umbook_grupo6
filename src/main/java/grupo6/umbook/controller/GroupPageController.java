@@ -2,6 +2,8 @@ package grupo6.umbook.controller;
 
 import grupo6.umbook.dto.CreateGroupRequest;
 import grupo6.umbook.model.Group;
+import grupo6.umbook.model.GroupPermission;
+import grupo6.umbook.model.GroupVisibility;
 import grupo6.umbook.model.User;
 import grupo6.umbook.repository.UserRepository;
 import grupo6.umbook.service.GroupService;
@@ -181,5 +183,49 @@ public class GroupPageController {
 
         // Renderiza el nuevo archivo "group-members.html"
         return "group_members";
+    }
+
+    /**
+     * Muestra la página para editar los permisos de un grupo.
+     */
+    @GetMapping("/groups/{groupId}/edit-permissions")
+    public String showEditGroupPermissionsPage(@PathVariable Long groupId, Model model, Authentication authentication) {
+        Group group = groupService.findById(groupId);
+
+        group.setPostPermission(null);
+        group.setCommentPermission(null);
+        group.setInvitePermission(null);
+        // Aquí podrías añadir una validación para asegurar que solo el creador pueda entrar
+
+        model.addAttribute("group", group);
+        return "edit_group_permissions";
+    }
+
+    /**
+     * Procesa los cambios de permisos del grupo.
+     */
+    @PostMapping("/groups/{groupId}/edit-permissions")
+    public String handleEditGroupPermissions(
+            @PathVariable Long groupId,
+            // Quitamos el @RequestParam para visibility
+            @RequestParam GroupPermission postPermission,
+            @RequestParam GroupPermission commentPermission,
+            @RequestParam GroupPermission invitePermission,
+            Authentication authentication) {
+
+        String userEmail = authentication.getName();
+        User currentUser = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+
+        // Llamamos al servicio sin el parámetro de visibilidad
+        groupService.setGroupPermissions(
+                groupId,
+                currentUser.getId(),
+                postPermission,
+                commentPermission,
+                invitePermission
+        );
+
+        return "redirect:/groups/" + groupId;
     }
 }

@@ -178,14 +178,11 @@ public class GroupController {
 
             // --- MANEJO SEGURO DE ENUMS ---
             // 2. Hacemos la conversión a enum insensible a mayúsculas y a prueba de nulos.
-            String visibilityStr = (String) request.get("visibility");
             String postPermissionStr = (String) request.get("postPermission");
             String commentPermissionStr = (String) request.get("commentPermission");
             String invitePermissionStr = (String) request.get("invitePermission");
 
             // Usamos .toUpperCase() para evitar errores por mayúsculas/minúsculas
-            GroupVisibility visibility = visibilityStr != null ?
-                    GroupVisibility.valueOf(visibilityStr.toUpperCase()) : null;
             GroupPermission postPermission = postPermissionStr != null ?
                     GroupPermission.valueOf(postPermissionStr.toUpperCase()) : null;
             GroupPermission commentPermission = commentPermissionStr != null ?
@@ -194,7 +191,7 @@ public class GroupController {
                     GroupPermission.valueOf(invitePermissionStr.toUpperCase()) : null;
 
             Group group = groupService.setGroupPermissions(
-                    groupId, userId, visibility, postPermission, commentPermission, invitePermission);
+                    groupId, userId, postPermission, commentPermission, invitePermission);
 
             return ResponseEntity.ok(group);
 

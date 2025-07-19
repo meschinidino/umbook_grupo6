@@ -25,6 +25,10 @@
                     </div>
                 </div>
                 <div class="group-actions">
+                    <a th:if="${currentUserEmail == group.creator.email}"
+                       th:href="@{/groups/{id}/edit-permissions(id=${group.id})}"
+                       class="btn-secondary-outline">Editar Permisos</a>
+
                     <a th:href="@{/groups/{id}/add-members(id=${group.id})}" class="btn-secondary-outline">Añadir Miembros</a>
                     <a th:href="@{/groups/{id}/members(id=${group.id})}" class="btn-primary">Ver Miembros</a>
                 </div>
