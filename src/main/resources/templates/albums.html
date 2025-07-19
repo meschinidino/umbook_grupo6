@@ -24,23 +24,19 @@
         </div>
 
         <div class="album-grid">
-
             <a th:each="album : ${albums}" th:href="@{/albums/{id}(id=${album.id})}" class="album-card">
 
                 <div class="album-thumbnails">
-                    <img src="https://via.placeholder.com/150" alt="thumbnail">
-                    <img src="https://via.placeholder.com/150" alt="thumbnail">
-                    <img src="https://via.placeholder.com/150" alt="thumbnail">
-                    <img src="https://via.placeholder.com/150" alt="thumbnail">
                 </div>
                 <div class="album-info">
-                    <h4 th:text="${album.name}">Pets Album</h4>
+                    <h4 th:text="${album.name}">Nombre del Álbum</h4>
                     <span th:text="${#lists.size(album.photos)} + ' photos'">15 photos</span>
                 </div>
-                <div class="edit-icon"><i class="fas fa-pencil-alt"></i></div>
 
+                <a th:href="@{/albums/{id}/edit-permissions(id=${album.id})}" class="edit-icon" onclick="event.stopPropagation();">
+                    <i class="fas fa-pencil-alt"></i>
+                </a>
             </a>
-
         </div>
     </main>
 

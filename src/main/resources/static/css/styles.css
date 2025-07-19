@@ -1070,3 +1070,15 @@ a.group-item {
     text-decoration: none;
     color: inherit; /* Hereda el color del texto normal */
 }
+
+/* Hacemos que la tarjeta del álbum sea el punto de referencia para el posicionamiento */
+.album-card {
+    position: relative;
+}
+
+/* El ícono de editar se posiciona de forma absoluta dentro de la tarjeta */
+.album-card .edit-icon {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+}

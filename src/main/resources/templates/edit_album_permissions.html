@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="'Editar Permisos - ' + ${album.name}">Editar Permisos</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="home-body">
+<div class="home-container">
+    <aside class="sidebar-left" th:replace="~{fragments/sidebar :: sidebar}"></aside>
+    <main class="feed">
+        <div class="form-wrapper">
+            <div class="form-header">
+                <a th:href="@{/albums/{id}(id=${album.id})}" class="back-link"><i class="fas fa-arrow-left"></i></a>
+                <h2 th:text="'Editar Permisos para ' + ${album.name}">Editar Permisos</h2>
+            </div>
+
+            <form th:action="@{/albums/{id}/edit-permissions(id=${album.id})}" method="post" class="creation-form">
+                <div class="group-permissions-section">
+                    <div th:each="group : ${userGroups}" class="group-permission-item">
+                        <div class="group-permission-info">
+                            <strong th:text="${group.name}">Nombre del Grupo</strong>
+                        </div>
+                        <div class="group-permission-toggles">
+                            <div class="toggle-control">
+                                <label>Comment</label>
+                                <label class="switch">
+                                    <input type="checkbox" name="commentPermissionGroupIds" th:value="${group.id}"
+                                           th:checked="${album.permittedToComment.contains(group)}">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-control">
+                                <label>See album</label>
+                                <label class="switch">
+                                    <input type="checkbox" name="viewPermissionGroupIds" th:value="${group.id}"
+                                           th:checked="${album.permittedToView.contains(group)}">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary form-submit-btn">Guardar Cambios</button>
+            </form>
+        </div>
+    </main>
+</div>
+</body>
+</html>

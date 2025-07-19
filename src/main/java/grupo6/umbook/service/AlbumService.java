@@ -171,4 +171,30 @@ public class AlbumService {
         // Collections.disjoint devuelve 'false' si hay al menos un elemento en común.
         return !Collections.disjoint(user.getGroups(), album.getPermittedToView());
     }
+
+    @Transactional
+    public void updateAlbumPermissions(Long albumId, Long userId, List<Long> viewIds, List<Long> commentIds) {
+        Album album = albumRepository.findById(albumId)
+                .orElseThrow(() -> new IllegalArgumentException("Álbum no encontrado"));
+
+        if (!album.getOwner().getId().equals(userId)) {
+            throw new SecurityException("Solo el dueño puede editar los permisos del álbum.");
+        }
+
+        // Actualizamos permisos de visualización
+        album.getPermittedToView().clear();
+        if (viewIds != null) {
+            List<Group> viewGroups = groupRepository.findAllById(viewIds);
+            album.getPermittedToView().addAll(viewGroups);
+        }
+
+        // Actualizamos permisos de comentario
+        album.getPermittedToComment().clear();
+        if (commentIds != null) {
+            List<Group> commentGroups = groupRepository.findAllById(commentIds);
+            album.getPermittedToComment().addAll(commentGroups);
+        }
+
+        albumRepository.save(album);
+    }
 }

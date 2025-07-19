@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 @Controller
 public class AlbumPageController {
@@ -204,6 +205,42 @@ public class AlbumPageController {
         photoService.deletePhoto(photoId, currentUser.getId());
 
         // Redirigimos de vuelta a la página del álbum actualizada
+        return "redirect:/albums/" + albumId;
+    }
+
+    @GetMapping("/albums/{albumId}/edit-permissions")
+    public String showEditAlbumPermissionsPage(@PathVariable Long albumId, Model model, Authentication authentication) {
+
+        String userEmail = authentication.getName();
+        User currentUser = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+        Album album = albumService.findById(albumId);
+
+        // Validación para que solo el dueño pueda editar
+        if (!album.getOwner().equals(currentUser)) {
+            return "redirect:/albums";
+        }
+
+        model.addAttribute("album", album);
+        model.addAttribute("userGroups", groupService.findGroupsByMember(currentUser.getId()));
+
+        return "edit_album_permissions"; // Nombre del nuevo archivo HTML
+    }
+
+    // Procesa los cambios de permisos del álbum.
+    @PostMapping("/albums/{albumId}/edit-permissions")
+    public String handleUpdateAlbumPermissions(
+            @PathVariable Long albumId,
+            @RequestParam(value = "viewPermissionGroupIds", required = false) List<Long> viewIds,
+            @RequestParam(value = "commentPermissionGroupIds", required = false) List<Long> commentIds,
+            Authentication authentication) {
+
+        String userEmail = authentication.getName();
+        User currentUser = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+
+        albumService.updateAlbumPermissions(albumId, currentUser.getId(), viewIds, commentIds);
+
         return "redirect:/albums/" + albumId;
     }
 
