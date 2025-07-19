@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="'Editar Permisos - ' + ${group.name}">Editar Permisos</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="home-body">
+<div class="home-container">
+    <aside class="sidebar-left" th:replace="~{fragments/sidebar :: sidebar}"></aside>
+    <main class="feed">
+        <div class="form-wrapper">
+            <div class="form-header">
+                <a th:href="@{/groups/{id}(id=${group.id})}" class="back-link"><i class="fas fa-arrow-left"></i></a>
+                <h2 th:text="'Editar Permisos de ' + ${group.name}">Editar Permisos</h2>
+            </div>
+
+            <form th:action="@{/groups/{id}/edit-permissions(id=${group.id})}" th:object="${group}" method="post" class="creation-form">
+                <div class="permissions-card" style="border: none; background: none; padding: 0;">
+
+                    <div class="permission-row">
+                        <label for="post-permission">Postear</label>
+                        <select id="post-permission" name="postPermission" required>
+                            <option value="" selected disabled>Elegir...</option>
+                            <option value="MEMBERS_ONLY" th:selected="${group.postPermission == T(grupo6.umbook.model.GroupPermission).MEMBERS_ONLY}">Solo miembros</option>
+                            <option value="ADMIN_ONLY" th:selected="${group.postPermission == T(grupo6.umbook.model.GroupPermission).ADMIN_ONLY}">Nadie (Solo Admins)</option>
+                        </select>
+                    </div>
+
+                    <div class="permission-row">
+                        <label for="comment-permission">Comentar</label>
+                        <select id="comment-permission" name="commentPermission" required>
+                            <option value="" selected disabled>Elegir...</option>
+                            <option value="MEMBERS_ONLY" th:selected="${group.commentPermission == T(grupo6.umbook.model.GroupPermission).MEMBERS_ONLY}">Solo miembros</option>
+                            <option value="ADMIN_ONLY" th:selected="${group.commentPermission == T(grupo6.umbook.model.GroupPermission).ADMIN_ONLY}">Nadie (Solo Admins)</option>
+                        </select>
+                    </div>
+
+                    <div class="permission-row">
+                        <label for="invite-permission">Invitar a otros</label>
+                        <select id="invite-permission" name="invitePermission" required>
+                            <option value="" selected disabled>Elegir...</option>
+                            <option value="MEMBERS_ONLY" th:selected="${group.invitePermission == T(grupo6.umbook.model.GroupPermission).MEMBERS_ONLY}">Solo miembros</option>
+                            <option value="ADMIN_ONLY" th:selected="${group.invitePermission == T(grupo6.umbook.model.GroupPermission).ADMIN_ONLY}">Nadie (Solo Admins)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary form-submit-btn" style="margin-top: 1.5rem;">Guardar Cambios</button>
+            </form>
+        </div>
+    </main>
+</div>
+</body>
+</html>

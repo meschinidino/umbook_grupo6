@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Subir Foto - UMbook</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="home-body">
+<div class="home-container">
+    <aside class="sidebar-left" th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <main class="feed">
+        <div class="form-wrapper">
+            <div class="form-header">
+                <a th:href="@{/albums/{id}(id=${albumId})}" class="back-link"><i class="fas fa-arrow-left"></i></a>
+                <h2>Subir Nueva Foto</h2>
+            </div>
+
+            <form th:action="@{/albums/{id}/upload(id=${albumId})}" method="post" enctype="multipart/form-data" class="creation-form">
+
+                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">
+                    Mensaje de error va aquí
+                </div>
+                <div class="form-section">
+                    <label for="file-upload">Seleccionar Archivo</label>
+                    <input type="file" id="file-upload" name="file" required class="form-control-file">
+                </div>
+
+                <div class="form-section">
+                    <label for="photo-description">Descripción (opcional)</label>
+                    <textarea id="photo-description" name="description" placeholder="Añade una descripción..." class="form-control"></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary form-submit-btn">Subir Foto</button>
+            </form>
+        </div>
+    </main>
+</div>
+</body>
+</html>

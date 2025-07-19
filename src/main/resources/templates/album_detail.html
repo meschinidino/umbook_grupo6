@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${album.name} + ' - UMbook'">Detalle de Álbum</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="home-body">
+
+<div class="home-container">
+
+    <aside class="sidebar-left" th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <main class="feed">
+        <div class="album-detail-content">
+
+            <aside class="album-nav">
+                <div class="album-nav-header">
+                    <img src="https://i.pravatar.cc/40" alt="User Avatar" class="avatar small-avatar">
+                    <h3>Album</h3>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li th:each="navAlbum : ${ownerAlbums}" th:class="${navAlbum.id == album.id} ? 'active'">
+                            <a th:href="@{/albums/{id}(id=${navAlbum.id})}" th:text="${navAlbum.name}">Nombre del Álbum</a>
+                        </li>
+                    </ul>
+                </nav>
+                <a th:href="@{/albums/{id}/upload(id=${album.id})}" class="btn-primary">+ New Photo</a>
+            </aside>
+
+            <div class="album-feed">
+                <div class="album-feed-header">
+                    <h2>Photos</h2>
+                </div>
+
+                <div class="feed">
+                    <article th:if="${!#lists.isEmpty(album.photos)}" th:each="photo : ${album.photos}" class="post">
+
+                        <header class="post-header">
+                            <div class="user-info">
+                                <img src="https://i.pravatar.cc/50" alt="Avatar" class="avatar">
+                                <div>
+                                    <strong th:text="${photo.uploader.firstName} + ' ' + ${photo.uploader.lastName}">Jessica Alba</strong>
+                                    <span th:text="'@' + ${photo.uploader.email}">@jessicaalba</span>
+                                </div>
+                            </div>
+                            <div class="dropdown">
+                                <button class="dropdown-toggle"><i class="fas fa-ellipsis-h"></i></button>
+                                <div class="dropdown-menu">
+                                    <a href="#">Edit</a>
+                                    <a th:href="@{/photos/{photoId}/delete(photoId=${photo.id}, albumId=${album.id})}"
+                                       onclick="return confirm('Are you sure you want to delete this photo?');">
+                                        Delete
+                                    </a>
+
+                                </div>
+                            </div>
+                        </header>
+
+                        <div class="post-content">
+                            <img th:src="@{'/api/photos/' + ${photo.id} + '/data'}" alt="Post image" class="post-image">
+                            <p th:if="${photo.description}" th:text="${photo.description}" class="photo-description"></p>
+                        </div>
+
+                    </article>
+
+                    <div th:if="${#lists.isEmpty(album.photos)}" class="empty-state">
+                        <p>This album has no photos yet.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <aside class="sidebar-right"></aside>
+</div>
+
+<script>
+    const feedContainer = document.querySelector('.album-feed .feed');
+
+    feedContainer.addEventListener('click', function(event) {
+        const toggleButton = event.target.closest('.dropdown-toggle');
+        if (toggleButton) {
+            const dropdownMenu = toggleButton.nextElementSibling;
+            if (dropdownMenu) {
+                dropdownMenu.classList.toggle('visible');
+            }
+        }
+    });
+</script>
+</body>
+</html>

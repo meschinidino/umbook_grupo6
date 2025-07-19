@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${group.name} + ' - UMbook'">Detalle de Grupo</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="home-body">
+
+<div class="home-container">
+    <aside class="sidebar-left" th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <main class="feed">
+        <div class="group-detail-header">
+            <div class="group-cover-photo">
+                <img src="https://via.placeholder.com/800x250" alt="Foto de portada del grupo">
+            </div>
+            <div class="group-info-bar">
+                <div class="group-info-main">
+                    <img src="https://i.pravatar.cc/150" alt="Foto de perfil del grupo" class="group-profile-photo">
+                    <div>
+                        <h2 th:text="${group.name}">Nombre del Grupo</h2>
+                        <span th:text="${#lists.size(group.members)} + ' members'">123 members</span>
+                    </div>
+                </div>
+                <div class="group-actions">
+                    <a th:if="${currentUserEmail == group.creator.email}"
+                       th:href="@{/groups/{id}/edit-permissions(id=${group.id})}"
+                       class="btn-secondary-outline">Editar Permisos</a>
+
+                    <a th:href="@{/groups/{id}/add-members(id=${group.id})}" class="btn-secondary-outline">Añadir Miembros</a>
+                    <a th:href="@{/groups/{id}/members(id=${group.id})}" class="btn-primary">Ver Miembros</a>
+                </div>
+            </div>
+        </div>
+
+        <article class="post">
+            <div class="post-content">
+                <p>¡Bienvenidos al grupo!</p>
+            </div>
+        </article>
+
+    </main>
+
+    <aside class="sidebar-right"></aside>
+</div>
+
+</body>
+</html>

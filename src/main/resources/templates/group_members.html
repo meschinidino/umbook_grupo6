@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Miembros de ' + ${group.name}">Miembros del Grupo</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="home-body">
+
+<div class="home-container">
+    <aside class="sidebar-left" th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <main class="feed">
+        <div class="form-wrapper">
+            <div class="form-header">
+                <a th:href="@{/groups/{id}(id=${group.id})}" class="back-link"><i class="fas fa-arrow-left"></i></a>
+                <h2 th:text="'Miembros de ' + ${group.name}">Miembros del Grupo</h2>
+            </div>
+
+            <div class="members-list-container">
+                <ul class="members-list">
+                    <li th:each="member : ${group.members}" class="member-item">
+                        <div class="member-info">
+                            <img src="https://i.pravatar.cc/40" alt="Avatar" class="avatar small-avatar">
+                            <div class="user-details">
+                                <strong th:text="${member.firstName} + ' ' + ${member.lastName}">Nombre del Miembro</strong>
+                                <span th:text="'@' + ${member.email}">email</span>
+                            </div>
+                        </div>
+                        <button class="remove-btn">Remove</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

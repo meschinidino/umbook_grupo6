@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<aside class="sidebar-left" th:fragment="sidebar">
+    <h1 class="home-logo">UMbook</h1>
+    <nav class="main-nav">
+        <ul>
+            <li th:class="${activePage == 'home'} ? 'active'">
+                <a th:href="@{/home}"><i class="fas fa-home"></i> Home</a>
+            </li>
+            <li><a th:href="@{#}"><i class="fas fa-bell"></i> Notifications</a></li>
+            <li><a th:href="@{#}"><i class="fas fa-envelope"></i> Messages</a></li>
+            <li th:class="${activePage == 'albums'} ? 'active'">
+                <a th:href="@{/albums}"><i class="fas fa-images"></i> Albums</a>
+            </li>
+            <li><a th:href="@{#}"><i class="fas fa-list-ul"></i> Lists</a></li>
+            <li th:class="${activePage == 'groups'} ? 'active'">
+                <a th:href="@{/groups}"><i class="fas fa-users"></i> Groups</a>
+            </li>
+            <li><a th:href="@{#}"><i class="fas fa-user-check"></i> Subscriptions</a></li>
+            <li><a th:href="@{#}"><i class="fas fa-credit-card"></i> Add Card</a></li>
+            <li><a th:href="@{#}"><i class="fas fa-user"></i> My Profile</a></li>
+        </ul>
+    </nav>
+    <button class="btn-new-post">New Post</button>
+</aside>
+
+</body>
+</html>

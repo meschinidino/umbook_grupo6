@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Crear Álbum - UMbook</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="home-body">
+
+<!-- Contenedor principal de 3 columnas -->
+<div class="home-container">
+
+    <!-- Columna 1: Barra Lateral -->
+    <aside class="sidebar-left" th:replace="~{fragments/sidebar :: sidebar}"></aside>
+
+    <!-- Columna 2: Contenido Principal -->
+    <main class="feed">
+        <div class="form-wrapper">
+
+            <div class="form-header">
+                <a th:href="@{/albums}" class="back-link"><i class="fas fa-arrow-left"></i></a>
+                <h2>Create Album</h2>
+            </div>
+
+            <form th:action="@{/albums/create}" th:object="${albumRequest}" method="post" enctype="multipart/form-data" class="creation-form">
+
+                <div class="form-section cover-photo-section">
+                    <label for="cover-photo" class="file-upload-label cover-photo-upload">
+                        <i class="fas fa-camera"></i>
+                        <span>Add Cover Photo</span>
+                    </label>
+                    <input type="file" id="cover-photo" name="coverPhoto" class="file-upload-input">
+                </div>
+
+                <div class="form-section profile-info-section">
+                    <div class="profile-photo-upload-wrapper">
+                        <label for="profile-photo" class="file-upload-label profile-photo-upload">
+                            <i class="fas fa-camera"></i>
+                            <span>Add Profile Photo</span>
+                        </label>
+                        <input type="file" id="profile-photo" name="profilePhoto" class="file-upload-input">
+                    </div>
+                    <div class="group-name-wrapper">
+                        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">
+                            Mensaje de error va aquí
+                        </div>
+                        <label for="album-name">Album Name</label>
+                        <input type="text" id="album-name" th:field="*{name}" placeholder="Write here..." required>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <label for="album-details">Album Details</label>
+                    <textarea id="album-details" th:field="*{description}" placeholder="Write here..."></textarea>
+                </div>
+                <div class="group-permissions-section">
+                    <div th:each="group : ${userGroups}" class="group-permission-item">
+                        <div class="group-permission-info">
+                            <img src="https://i.pravatar.cc/40" alt="Avatar" class="avatar small-avatar">
+                            <div>
+                                <strong th:text="${group.name}">Nombre del Grupo</strong>
+                                <small>10+ posts a day</small>
+                            </div>
+                        </div>
+                        <div class="group-permission-toggles">
+                            <div class="toggle-control">
+                                <label>Comment</label>
+                                <label class="switch">
+                                    <input type="checkbox" name="commentPermissionGroupIds" th:value="${group.id}">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-control">
+                                <label>See album</label>
+                                <label class="switch">
+                                    <input type="checkbox" name="viewPermissionGroupIds" th:value="${group.id}">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary form-submit-btn">Create Album</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Columna 3: Barra Derecha (vacía) -->
+    <aside class="sidebar-right"></aside>
+</div>
+</body>
+</html>
