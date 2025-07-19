@@ -160,6 +160,32 @@ public class AlbumPageController {
         return "redirect:/albums/" + albumId;
     }
 
+    @GetMapping("/albums/{albumId}/upload")
+    public String showUploadPhotoForm(
+            @PathVariable Long albumId,
+            Model model,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        Album currentAlbum = albumService.findById(albumId);
+        User currentUser = null;
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            currentUser = userRepository.findByEmail(authentication.getName())
+                    .orElse(null);
+        }
+
+        // Validamos permisos
+        if (!albumService.canUserViewAlbum(currentAlbum, currentUser)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "No tienes permiso para subir fotos a este álbum.");
+            return "redirect:/albums";
+        }
+
+        model.addAttribute("albumId", albumId);
+        model.addAttribute("album", currentAlbum);
+        return "upload_photo";
+    }
+
     /**
      * AÑADIDO: Maneja la petición para eliminar una foto.
      */
