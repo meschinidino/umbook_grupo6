@@ -25,8 +25,8 @@
                     </div>
                 </div>
                 <div class="group-actions">
-                    <button th:if="${currentUserEmail != group.creator.email}" class="btn-primary">Join Group</button>
-                    <button class="btn-secondary-outline">Invite</button>
+                    <a th:href="@{/groups/{id}/add-members(id=${group.id})}" class="btn-secondary-outline">Añadir Miembros</a>
+                    <a th:href="@{/groups/{id}/members(id=${group.id})}" class="btn-primary">Ver Miembros</a>
                 </div>
             </div>
         </div>

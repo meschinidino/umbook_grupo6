@@ -82,10 +82,6 @@ public class GroupService {
             throw new IllegalArgumentException("Ya tienes un grupo activo con este nombre.");
         }
 
-        if (memberIds == null || memberIds.isEmpty()) {
-            throw new IllegalArgumentException("Debes agregar al menos un miembro al grupo.");
-        }
-
         User creator = userRepository.findById(creatorId)
                 .orElseThrow(() -> new IllegalArgumentException("Creator not found"));
 
@@ -295,5 +291,21 @@ public class GroupService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         return groupRepository.isUserMemberOfGroup(groupId, user);
+    }
+
+    @Transactional
+    public void addMembersToGroup(Long groupId, List<Long> memberIds) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("Grupo no encontrado"));
+
+        List<User> newMembers = userRepository.findAllById(memberIds);
+        group.getMembers().addAll(newMembers);
+
+        // Si el grupo estaba sin miembros, ahora los tiene
+        if(group.getState() == GroupState.SIN_MIEMBROS){
+            group.setState(GroupState.CON_MIEMBROS);
+        }
+
+        groupRepository.save(group);
     }
 }

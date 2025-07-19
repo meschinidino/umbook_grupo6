@@ -135,4 +135,51 @@ public class GroupPageController {
 
         return "group_detail";
     }
+
+    @GetMapping("/groups/{groupId}/add-members")
+    public String showAddMembersPage(@PathVariable Long groupId, Model model, Authentication authentication) {
+
+        // Obtenemos el grupo y el usuario actual
+        Group group = groupService.findById(groupId);
+        String userEmail = authentication.getName();
+        User currentUser = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+
+        // Filtramos la lista de amigos para mostrar solo los que no son miembros
+        List<User> friendsToAdd = currentUser.getFriends().stream()
+                .filter(friend -> !group.getMembers().contains(friend))
+                .toList();
+
+        model.addAttribute("group", group);
+        model.addAttribute("friendsToAdd", friendsToAdd);
+
+        return "add_members_to_group";
+    }
+
+    @PostMapping("/groups/{groupId}/add-members")
+    public String handleAddMembers(@PathVariable Long groupId,
+                                   @RequestParam(value="memberIds", required = false) List<Long> memberIds,
+                                   RedirectAttributes redirectAttributes) {
+
+        // Validamos que se haya seleccionado al menos un amigo
+        if (memberIds == null || memberIds.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Debe seleccionar al menos un amigo para agregar al grupo.");
+            return "redirect:/groups/" + groupId + "/add-members";
+        }
+
+        groupService.addMembersToGroup(groupId, memberIds);
+        return "redirect:/groups/" + groupId;
+    }
+
+    @GetMapping("/groups/{groupId}/members")
+    public String showGroupMembersPage(@PathVariable Long groupId, Model model) {
+
+        Group currentGroup = groupService.findById(groupId);
+
+        model.addAttribute("group", currentGroup);
+        model.addAttribute("activePage", "groups");
+
+        // Renderiza el nuevo archivo "group-members.html"
+        return "group_members";
+    }
 }

@@ -90,7 +90,7 @@
 
                         <div class="permission-row">
                             <label for="post-permission">Postear</label>
-                            <select id="post-permission" th:field="*{postPermission}" required>
+                            <select id="post-permission" th:field="*{postPermission}">
                                 <option value="" selected disabled>Elegir...</option>
                                 <option value="MEMBERS_ONLY">Solo miembros</option> <option value="ADMIN_ONLY">Nadie (Solo Admins)</option>
                             </select>
@@ -98,7 +98,7 @@
 
                         <div class="permission-row">
                             <label for="comment-permission">Comentar</label>
-                            <select id="comment-permission" th:field="*{commentPermission}" required>
+                            <select id="comment-permission" th:field="*{commentPermission}">
                                 <option value="" selected disabled>Elegir...</option>
                                 <option value="MEMBERS_ONLY">Solo miembros</option> <option value="ADMIN_ONLY">Nadie (Solo Admins)</option>
                             </select>
@@ -106,7 +106,7 @@
 
                         <div class="permission-row">
                             <label for="invite-permission">Invitar a otros</label>
-                            <select id="invite-permission" th:field="*{invitePermission}" required>
+                            <select id="invite-permission" th:field="*{invitePermission}">
                                 <option value="" selected disabled>Elegir...</option>
                                 <option value="MEMBERS_ONLY">Solo miembros</option> <option value="ADMIN_ONLY">Nadie (Solo Admins)</option>
                             </select>
