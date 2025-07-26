@@ -41,11 +41,9 @@ public class GroupController {
             CreateGroupRequest groupRequest = new CreateGroupRequest();
             groupRequest.setName(name);
             groupRequest.setDescription(description);
-            // Aquí también podrías obtener los permisos del 'request' y ponerlos en el DTO
-            // groupRequest.setVisibility((String) request.get("visibility"));
 
             // 2. Llamamos al servicio con la firma correcta (DTO y Long)
-            Group group = groupService.createGroup(groupRequest, creatorId);
+            Group group = groupService.createGroup(groupRequest, creatorId, null);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(group);
 
