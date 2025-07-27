@@ -1,234 +1,230 @@
 package grupo6.umbook.controller;
 
 import grupo6.umbook.dto.CreateGroupRequest;
-import grupo6.umbook.model.*;
+import grupo6.umbook.model.Group;
+import grupo6.umbook.model.GroupPermission;
+import grupo6.umbook.model.User;
+import grupo6.umbook.repository.UserRepository;
 import grupo6.umbook.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication; // <-- IMPORT AÑADIDO
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-@RestController
-@RequestMapping("/api/groups")
+@Controller
 public class GroupController {
 
-    private final GroupService groupService;
+    @Autowired
+    private GroupService groupService;
 
     @Autowired
-    public GroupController(GroupService groupService) {
-        this.groupService = groupService;
-    }
+    private UserRepository userRepository;
 
-    @PostMapping
-    public ResponseEntity<?> createGroup(@RequestBody Map<String, Object> request) {
-        try {
-            String name = (String) request.get("name");
-            String description = (String) request.get("description");
+    @GetMapping("/groups")
+    public String showGroupsPage(Model model, Authentication authentication) {
 
-            if (request.get("creatorId") == null || name == null) {
-                Map<String, String> response = new HashMap<>();
-                response.put("error", "Name and creator ID are required");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-            Long creatorId = Long.valueOf(request.get("creatorId").toString());
+        // Esto ya lo tenías, y está bien
+        model.addAttribute("groups", groupService.findPublicGroups());
 
-            // 1. Creamos el objeto DTO que el servicio espera
-            CreateGroupRequest groupRequest = new CreateGroupRequest();
-            groupRequest.setName(name);
-            groupRequest.setDescription(description);
-
-            // 2. Llamamos al servicio con la firma correcta (DTO y Long)
-            Group group = groupService.createGroup(groupRequest, creatorId, null);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(group);
-
-        } catch (Exception e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        // AÑADIDO: Obtenemos el email del usuario actual y lo pasamos a la vista
+        if (authentication != null && authentication.isAuthenticated()) {
+            // authentication.getName() devuelve el username, que en nuestro caso es el email
+            model.addAttribute("currentUserEmail", authentication.getName());
+        } else {
+            // En caso de que no haya nadie logueado, pasamos un valor nulo
+            model.addAttribute("currentUserEmail", null);
         }
+        return "groups";
     }
 
-    @GetMapping("/{groupId}")
-    public ResponseEntity<?> getGroupById(@PathVariable Long groupId) {
+    @GetMapping("/groups/create")
+    public String showCreateGroupPage(Model model, Authentication authentication) {
+        CreateGroupRequest groupRequest = new CreateGroupRequest();
+
+        // Establecer valores vacíos para que se muestre "Elegir..." en el select
+        groupRequest.setPostPermission("");
+        groupRequest.setCommentPermission("");
+        groupRequest.setInvitePermission("");
+
+        model.addAttribute("groupRequest", groupRequest);
+
+        // Obtenemos el usuario autenticado
+        String email = authentication.getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
+
+        List<User> otherUsers = userRepository.findAll()
+                .stream()
+                .filter(user -> !user.getId().equals(currentUser.getId()))
+                .toList();
+
+        model.addAttribute("suggestedUsers", otherUsers);
+
+        return "create_group";
+    }
+
+    @PostMapping("/groups/create")
+    public String handleCreateGroup(@ModelAttribute CreateGroupRequest groupRequest,
+                                    @RequestParam(value = "memberIds", required = false) List<Long> memberIds,
+                                    Authentication authentication,
+                                    Model model) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/login";
+        }
+
+        String userEmail = authentication.getName();
+        User creator = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalStateException("Authenticated user not found."));
+
         try {
-            Group group = groupService.findById(groupId);
-            return ResponseEntity.ok(group);
+            groupService.createGroup(groupRequest, creator.getId(), memberIds);
+            return "redirect:/groups";
+
         } catch (IllegalArgumentException e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-    }
+            String msg = e.getMessage();
 
-    @GetMapping("/creator/{creatorId}")
-    public ResponseEntity<List<Group>> getGroupsByCreator(@PathVariable Long creatorId) {
-        List<Group> groups = groupService.findByCreator(creatorId);
-        return ResponseEntity.ok(groups);
-    }
-
-    @GetMapping("/member/{userId}")
-    public ResponseEntity<List<Group>> getGroupsByMember(@PathVariable Long userId) {
-        List<Group> groups = groupService.findGroupsByMember(userId);
-        return ResponseEntity.ok(groups);
-    }
-
-    @GetMapping("/public")
-    public ResponseEntity<List<Group>> getPublicGroups() {
-        List<Group> groups = groupService.findPublicGroups();
-        return ResponseEntity.ok(groups);
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<List<Group>> searchGroups(@RequestParam String term) {
-        List<Group> groups = groupService.searchGroups(term);
-        return ResponseEntity.ok(groups);
-    }
-
-    @PutMapping("/{groupId}")
-    public ResponseEntity<?> updateGroup(
-            @PathVariable Long groupId,
-            @RequestBody Map<String, Object> request) {
-        try {
-            String name = (String) request.get("name");
-            String description = (String) request.get("description");
-            Long userId = Long.valueOf(request.get("userId").toString());
-
-            Group group = groupService.updateGroup(groupId, name, description, userId);
-            return ResponseEntity.ok(group);
-        } catch (IllegalArgumentException e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-    }
-
-    @PostMapping("/{groupId}/members")
-    public ResponseEntity<?> addMemberToGroup(
-            @PathVariable Long groupId,
-            @RequestBody Map<String, Long> request) {
-        try {
-            Long userId = request.get("userId");
-            Long inviterId = request.get("inviterId");
-
-            if (userId == null || inviterId == null) {
-                Map<String, String> response = new HashMap<>();
-                response.put("error", "User ID and inviter ID are required");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            if (msg.contains("Group name already exists")) {
+                model.addAttribute("errorMessage", "The group name cannot be repeated. Please enter a valid name.");
+            } else if (msg.contains("permisos") || msg.contains("permissions")) {
+                model.addAttribute("errorMessage", "Debes seleccionar todos los permisos del grupo.");
+            } else {
+                model.addAttribute("errorMessage", "Ocurrió un error inesperado.");
             }
 
-            Group group = groupService.addMemberToGroup(groupId, userId, inviterId);
-            return ResponseEntity.ok(group);
-        } catch (IllegalArgumentException e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            model.addAttribute("groupRequest", groupRequest);
+            return "create_group";
         }
     }
 
-    @DeleteMapping("/{groupId}/members/{userId}")
-    public ResponseEntity<?> removeMemberFromGroup(
-            @PathVariable Long groupId,
-            @PathVariable Long userId,
-            @RequestParam Long removerId) {
-        try {
-            Group group = groupService.removeMemberFromGroup(groupId, userId, removerId);
-            return ResponseEntity.ok(group);
-        } catch (IllegalArgumentException e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-    }
+        @PostMapping("/groups/delete/{groupId}")
+    public String deleteGroupWeb(@PathVariable Long groupId,
+                                 Authentication authentication,
+                                 RedirectAttributes redirectAttributes) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
 
-    // AÑADIDO: Endpoint para el borrado lógico de un grupo.
-    @DeleteMapping("/{groupId}")
-    public ResponseEntity<?> deleteGroup(@PathVariable Long groupId, @RequestParam Long userId) {
         try {
-            groupService.deleteGroup(groupId, userId);
-            return ResponseEntity.ok().body(Map.of("message", "Group marked as deleted successfully."));
+            groupService.deleteGroup(groupId, user.getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Grupo eliminado correctamente.");
         } catch (Exception e) {
-            Map<String, String> response = new HashMap<>();
-            response.put("error", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            redirectAttributes.addFlashAttribute("errorMessage", "No se pudo eliminar el grupo: " + e.getMessage());
         }
+
+        return "redirect:/groups";
     }
 
-    @PutMapping("/{groupId}/permissions")
-    public ResponseEntity<?> setGroupPermissions(
+    /**
+     * AÑADIDO: Muestra la página de detalle de un grupo específico.
+     */
+    @GetMapping("/groups/{groupId}")
+    public String showGroupDetailPage(@PathVariable Long groupId, Model model, Authentication authentication) {
+
+        Group currentGroup = groupService.findById(groupId);
+        model.addAttribute("group", currentGroup);
+        model.addAttribute("activePage", "groups");
+
+        // AÑADIDO: Pasamos el email del usuario actual a la vista
+        if (authentication != null && authentication.isAuthenticated()) {
+            model.addAttribute("currentUserEmail", authentication.getName());
+        }
+
+        return "group_detail";
+    }
+
+    @GetMapping("/groups/{groupId}/add-members")
+    public String showAddMembersPage(@PathVariable Long groupId, Model model, Authentication authentication) {
+
+        // Obtenemos el grupo y el usuario actual
+        Group group = groupService.findById(groupId);
+        String userEmail = authentication.getName();
+        User currentUser = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
+
+        // Filtramos la lista de amigos para mostrar solo los que no son miembros
+        List<User> friendsToAdd = currentUser.getFriends().stream()
+                .filter(friend -> !group.getMembers().contains(friend))
+                .toList();
+
+        model.addAttribute("group", group);
+        model.addAttribute("friendsToAdd", friendsToAdd);
+
+        return "add_members_to_group";
+    }
+
+    @PostMapping("/groups/{groupId}/add-members")
+    public String handleAddMembers(@PathVariable Long groupId,
+                                   @RequestParam(value="memberIds", required = false) List<Long> memberIds,
+                                   RedirectAttributes redirectAttributes) {
+
+        // Validamos que se haya seleccionado al menos un amigo
+        if (memberIds == null || memberIds.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Debe seleccionar al menos un amigo para agregar al grupo.");
+            return "redirect:/groups/" + groupId + "/add-members";
+        }
+
+        groupService.addMembersToGroup(groupId, memberIds);
+        return "redirect:/groups/" + groupId;
+    }
+
+    @GetMapping("/groups/{groupId}/members")
+    public String showGroupMembersPage(@PathVariable Long groupId, Model model) {
+
+        Group currentGroup = groupService.findById(groupId);
+
+        model.addAttribute("group", currentGroup);
+        model.addAttribute("activePage", "groups");
+
+        // Renderiza el nuevo archivo "group-members.html"
+        return "group_members";
+    }
+
+    /**
+     * Muestra la página para editar los permisos de un grupo.
+     */
+    @GetMapping("/groups/{groupId}/edit-permissions")
+    public String showEditGroupPermissionsPage(@PathVariable Long groupId, Model model, Authentication authentication) {
+        Group group = groupService.findById(groupId);
+
+        group.setPostPermission(null);
+        group.setCommentPermission(null);
+        group.setInvitePermission(null);
+        // Aquí podrías añadir una validación para asegurar que solo el creador pueda entrar
+
+        model.addAttribute("group", group);
+        return "edit_group_permissions";
+    }
+
+    /**
+     * Procesa los cambios de permisos del grupo.
+     */
+    @PostMapping("/groups/{groupId}/edit-permissions")
+    public String handleEditGroupPermissions(
             @PathVariable Long groupId,
-            @RequestBody Map<String, Object> request) {
-        try {
-            // --- VALIDACIÓN DE userId ---
-            // 1. Verificamos que el userId exista en la petición antes de usarlo.
-            Object userIdObj = request.get("userId");
-            if (userIdObj == null) {
-                Map<String, String> response = new HashMap<>();
-                response.put("error", "userId is required");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-            Long userId = Long.valueOf(userIdObj.toString());
+            // Quitamos el @RequestParam para visibility
+            @RequestParam GroupPermission postPermission,
+            @RequestParam GroupPermission commentPermission,
+            @RequestParam GroupPermission invitePermission,
+            Authentication authentication) {
 
-            // --- MANEJO SEGURO DE ENUMS ---
-            // 2. Hacemos la conversión a enum insensible a mayúsculas y a prueba de nulos.
-            String postPermissionStr = (String) request.get("postPermission");
-            String commentPermissionStr = (String) request.get("commentPermission");
-            String invitePermissionStr = (String) request.get("invitePermission");
+        String userEmail = authentication.getName();
+        User currentUser = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalStateException("Usuario no encontrado"));
 
-            // Usamos .toUpperCase() para evitar errores por mayúsculas/minúsculas
-            GroupPermission postPermission = postPermissionStr != null ?
-                    GroupPermission.valueOf(postPermissionStr.toUpperCase()) : null;
-            GroupPermission commentPermission = commentPermissionStr != null ?
-                    GroupPermission.valueOf(commentPermissionStr.toUpperCase()) : null;
-            GroupPermission invitePermission = invitePermissionStr != null ?
-                    GroupPermission.valueOf(invitePermissionStr.toUpperCase()) : null;
+        // Llamamos al servicio sin el parámetro de visibilidad
+        groupService.setGroupPermissions(
+                groupId,
+                currentUser.getId(),
+                postPermission,
+                commentPermission,
+                invitePermission
+        );
 
-            Group group = groupService.setGroupPermissions(
-                    groupId, userId, postPermission, commentPermission, invitePermission);
-
-            return ResponseEntity.ok(group);
-
-        } catch (IllegalArgumentException e) {
-            // Este catch ahora manejará errores si se envía un valor de enum inválido (ej. "PUBLI")
-            Map<String, String> response = new HashMap<>();
-            response.put("error", "Invalid value for permission or visibility: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        } catch (Exception e) {
-            // Catch general para otros posibles errores
-            Map<String, String> response = new HashMap<>();
-            response.put("error", "An unexpected error occurred: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
-    }
-
-    @GetMapping("/{groupId}/members")
-    public ResponseEntity<Set<User>> getGroupMembers(@PathVariable Long groupId) {
-        try {
-            Set<User> members = groupService.getGroupMembers(groupId);
-            // Remove passwords from the response
-            members.forEach(member -> member.setPassword(null));
-            return ResponseEntity.ok(members);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }
-
-    @GetMapping("/{groupId}/is-member/{userId}")
-    public ResponseEntity<Map<String, Boolean>> isUserMemberOfGroup(
-            @PathVariable Long groupId,
-            @PathVariable Long userId) {
-        try {
-            boolean isMember = groupService.isUserMemberOfGroup(groupId, userId);
-            Map<String, Boolean> response = new HashMap<>();
-            response.put("isMember", isMember);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+        return "redirect:/groups/" + groupId;
     }
 }
