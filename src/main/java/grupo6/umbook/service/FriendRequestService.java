@@ -53,7 +53,7 @@ public class FriendRequestService {
 
         // Check if there's a pending request in the opposite direction
         Optional<FriendRequest> oppositeRequest = friendRequestRepository.findBySenderAndReceiver(receiver, sender);
-        if (oppositeRequest.isPresent() && oppositeRequest.get().getStatus() == FriendRequest.FriendRequestStatus.PENDING) {
+        if (oppositeRequest.isPresent() && oppositeRequest.get().isPending()) {
             // Accept the opposite request instead of creating a new one
             return acceptFriendRequest(oppositeRequest.get().getId(), senderId);
         }
@@ -81,33 +81,33 @@ public class FriendRequestService {
             throw new IllegalArgumentException("Only the receiver can accept the request");
         }
 
-        if (request.getStatus() != FriendRequest.FriendRequestStatus.PENDING) {
+        if (!request.isPending()) {
             throw new IllegalArgumentException("Request is not pending");
         }
 
-        // Update request status
-        request.setStatus(FriendRequest.FriendRequestStatus.ACCEPTED);
-        request.setUpdatedAt(LocalDateTime.now());
+        try {
+            // Use the state pattern to accept the request
+            request.accept();
+            
+            // Save changes
+            User sender = request.getSender();
+            User receiver = request.getReceiver();
+            userRepository.save(sender);
+            userRepository.save(receiver);
+            FriendRequest savedRequest = friendRequestRepository.save(request);
 
-        // Add users as friends
-        User sender = request.getSender();
-        User receiver = request.getReceiver();
-        sender.addFriend(receiver);
+            // Create notification for the sender using NotificationService
+            notificationService.createNotification(
+                    sender.getId(),
+                    receiver.getFirstName() + " " + receiver.getLastName() + " accepted your friend request",
+                    Notification.NotificationType.FRIEND_ACCEPTED,
+                    savedRequest.getId()
+            );
 
-        // Save changes
-        userRepository.save(sender);
-        userRepository.save(receiver);
-        FriendRequest savedRequest = friendRequestRepository.save(request);
-
-        // Create notification for the sender using NotificationService
-        notificationService.createNotification(
-                sender.getId(),
-                receiver.getFirstName() + " " + receiver.getLastName() + " accepted your friend request",
-                Notification.NotificationType.FRIEND_ACCEPTED,
-                savedRequest.getId()
-        );
-
-        return savedRequest;
+            return savedRequest;
+        } catch (IllegalStateException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
     @Transactional
@@ -119,15 +119,18 @@ public class FriendRequestService {
             throw new IllegalArgumentException("Only the receiver can reject the request");
         }
 
-        if (request.getStatus() != FriendRequest.FriendRequestStatus.PENDING) {
+        if (!request.isPending()) {
             throw new IllegalArgumentException("Request is not pending");
         }
 
-        // Update request status
-        request.setStatus(FriendRequest.FriendRequestStatus.REJECTED);
-        request.setUpdatedAt(LocalDateTime.now());
-
-        return friendRequestRepository.save(request);
+        try {
+            // Use the state pattern to reject the request
+            request.reject();
+            
+            return friendRequestRepository.save(request);
+        } catch (IllegalStateException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
     @Transactional(readOnly = true)
