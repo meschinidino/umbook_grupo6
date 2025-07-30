@@ -19,16 +19,20 @@ public class FriendRequest {
     @JoinColumn(name = "receiver_id", nullable = false)
     private User receiver;
 
+    // For backward compatibility with existing code
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private FriendRequestStatus status = FriendRequestStatus.PENDING;
+    @Column(name = "status", nullable = false)
+    private FriendRequestStatus legacyStatus = FriendRequestStatus.PENDING;
+
+    @Transient // This field is not persisted directly
+    private FriendRequestState state = new PendingState(); // Default state is PENDING
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private LocalDateTime updatedAt;
 
-    // Enum for request status
+    // Enum for request status (kept for backward compatibility)
     public enum FriendRequestStatus {
         PENDING, ACCEPTED, REJECTED
     }
@@ -40,6 +44,36 @@ public class FriendRequest {
     public FriendRequest(User sender, User receiver) {
         this.sender = sender;
         this.receiver = receiver;
+    }
+
+    // State pattern methods
+    public void setState(FriendRequestState state) {
+        this.state = state;
+        // Update the legacy status for backward compatibility
+        if (state.isPending()) {
+            this.legacyStatus = FriendRequestStatus.PENDING;
+        } else if (state.isAccepted()) {
+            this.legacyStatus = FriendRequestStatus.ACCEPTED;
+        } else if (state.isRejected()) {
+            this.legacyStatus = FriendRequestStatus.REJECTED;
+        }
+    }
+
+    public FriendRequestState getState() {
+        return state;
+    }
+
+    // State-specific actions
+    public void send() {
+        setState(state.send(this));
+    }
+
+    public void accept() {
+        setState(state.accept(this));
+    }
+
+    public void reject() {
+        setState(state.reject(this));
     }
 
     // Getters and Setters
@@ -67,13 +101,24 @@ public class FriendRequest {
         this.receiver = receiver;
     }
 
+    // For backward compatibility
     public FriendRequestStatus getStatus() {
-        return status;
+        return legacyStatus;
     }
 
+    // For backward compatibility
     public void setStatus(FriendRequestStatus status) {
-        this.status = status;
+        this.legacyStatus = status;
         this.updatedAt = LocalDateTime.now();
+        
+        // Update the state object to match the status
+        if (status == FriendRequestStatus.PENDING) {
+            this.state = new PendingState();
+        } else if (status == FriendRequestStatus.ACCEPTED) {
+            this.state = new AcceptedState();
+        } else if (status == FriendRequestStatus.REJECTED) {
+            this.state = new RejectedState();
+        }
     }
 
     public LocalDateTime getCreatedAt() {
@@ -103,5 +148,18 @@ public class FriendRequest {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+    
+    // Helper methods for state checking
+    public boolean isPending() {
+        return state.isPending();
+    }
+    
+    public boolean isAccepted() {
+        return state.isAccepted();
+    }
+    
+    public boolean isRejected() {
+        return state.isRejected();
     }
 }

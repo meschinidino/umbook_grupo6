@@ -24,13 +24,12 @@ public class GroupController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping("/groups")
+   @GetMapping("/groups")
     public String showGroupsPage(Model model, Authentication authentication) {
 
-        // Esto ya lo tenías, y está bien
         model.addAttribute("groups", groupService.findPublicGroups());
 
-        // AÑADIDO: Obtenemos el email del usuario actual y lo pasamos a la vista
+        // Obtenemos el email del usuario actual y lo pasamos a la vista
         if (authentication != null && authentication.isAuthenticated()) {
             // authentication.getName() devuelve el username, que en nuestro caso es el email
             model.addAttribute("currentUserEmail", authentication.getName());
@@ -40,6 +39,7 @@ public class GroupController {
         }
         return "groups";
     }
+
 
     @GetMapping("/groups/create")
     public String showCreateGroupPage(Model model, Authentication authentication) {
