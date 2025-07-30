@@ -125,7 +125,7 @@ public class AlbumService {
             throw new IllegalArgumentException("Only the owner can delete the album");
         }
 
-        // MODIFICADO: En lugar de borrar, cambiamos el estado
+        // En lugar de borrar, cambiamos el estado
         album.setState(AlbumState.ELIMINADO);
         albumRepository.save(album);
     }
@@ -162,13 +162,10 @@ public class AlbumService {
             return false;
         }
 
-        // Opción 1: El usuario es el dueño del álbum.
         if (album.getOwner().equals(user)) {
             return true;
         }
 
-        // Opción 2: El usuario es miembro de un grupo con permiso para ver.
-        // Collections.disjoint devuelve 'false' si hay al menos un elemento en común.
         return !Collections.disjoint(user.getGroups(), album.getPermittedToView());
     }
 

@@ -10,12 +10,10 @@ public class CreateGroupRequest {
     private String commentPermission;
     private String invitePermission;
 
-    // MODIFICADO: El tipo de dato ahora es MultipartFile
+
     private MultipartFile coverPhoto;
     private MultipartFile profilePhoto;
 
-    // --- GETTERS Y SETTERS ---
-    // (Los getters y setters para name, description, y los permisos se quedan igual)
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
