@@ -31,76 +31,43 @@ public class GroupService {
     }
 
     @Transactional
-    public Group createGroup(CreateGroupRequest request, Long creatorId) {
-        String name = request.getName();
-        String description = request.getDescription();
-
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Group name cannot be empty");
-        }
-
-        Optional<Group> existingGroupOpt = groupRepository.findByName(name);
-        if (existingGroupOpt.isPresent() && existingGroupOpt.get().getState() != GroupState.ELIMINADO) {
-            throw new IllegalArgumentException("Group name already exists");
-        }
-
-        // 🚨 Validaciones de permisos
-        if (request.getPostPermission() == null || request.getPostPermission().isBlank()
-                || request.getCommentPermission() == null || request.getCommentPermission().isBlank()
-                || request.getInvitePermission() == null || request.getInvitePermission().isBlank()) {
-            throw new IllegalArgumentException("All permissions must be selected before creating the group.");
-        }
-
-        User creator = userRepository.findById(creatorId)
-                .orElseThrow(() -> new IllegalArgumentException("Creator not found"));
-
-        Group group = new Group(name, description, creator);
-
-        group.setPostPermission(GroupPermission.valueOf(request.getPostPermission().toUpperCase()));
-        group.setCommentPermission(GroupPermission.valueOf(request.getCommentPermission().toUpperCase()));
-        group.setInvitePermission(GroupPermission.valueOf(request.getInvitePermission().toUpperCase()));
-
-        if (group.getMembers().isEmpty()) {
-            throw new IllegalArgumentException("Group must have at least one member.");
-        }
-
-        return groupRepository.save(group);
-    }
-
-    // NUEVO método: llamado desde el formulario web
-    @Transactional
     public Group createGroup(CreateGroupRequest request, Long creatorId, List<Long> memberIds) {
         String name = request.getName();
         String description = request.getDescription();
 
+        // 1. Validaciones
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre del grupo no puede estar vacío.");
         }
-
-        // CORREGIDO: Usamos el nuevo método para validar solo contra grupos activos
         if (groupRepository.existsByNameAndStateNot(name, GroupState.ELIMINADO)) {
             throw new IllegalArgumentException("Ya tienes un grupo activo con este nombre.");
         }
-
         User creator = userRepository.findById(creatorId)
                 .orElseThrow(() -> new IllegalArgumentException("Creator not found"));
 
+        // 2. Creación del grupo
         Group group = new Group(name, description, creator);
 
-        // Asignamos permisos
-        if (request.getPostPermission() != null) group.setPostPermission(GroupPermission.valueOf(request.getPostPermission().toUpperCase()));
-        if (request.getCommentPermission() != null) group.setCommentPermission(GroupPermission.valueOf(request.getCommentPermission().toUpperCase()));
-        if (request.getInvitePermission() != null) group.setInvitePermission(GroupPermission.valueOf(request.getInvitePermission().toUpperCase()));
+        // 3. Asignación de permisos
+        if (request.getPostPermission() != null && !request.getPostPermission().isBlank()) {
+            group.setPostPermission(GroupPermission.valueOf(request.getPostPermission().toUpperCase()));
+        }
+        if (request.getCommentPermission() != null && !request.getCommentPermission().isBlank()) {
+            group.setCommentPermission(GroupPermission.valueOf(request.getCommentPermission().toUpperCase()));
+        }
+        if (request.getInvitePermission() != null && !request.getInvitePermission().isBlank()) {
+            group.setInvitePermission(GroupPermission.valueOf(request.getInvitePermission().toUpperCase()));
+        }
 
-        // Añadimos miembros
+        // 4. Se añaden los miembros (ahora es opcional)
         if (memberIds != null && !memberIds.isEmpty()) {
             List<User> newMembers = userRepository.findAllById(memberIds);
             group.getMembers().addAll(newMembers);
         }
 
+        // 5. Se guarda y devuelve el grupo
         return groupRepository.save(group);
     }
-
     @Transactional(readOnly = true)
     public Group findById(Long groupId) {
         return groupRepository.findById(groupId)

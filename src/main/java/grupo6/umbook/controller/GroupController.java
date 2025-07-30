@@ -24,7 +24,7 @@ public class GroupController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping("/groups")
+   @GetMapping("/groups")
     public String showGroupsPage(Model model, Authentication authentication) {
 
         model.addAttribute("groups", groupService.findPublicGroups());
@@ -39,6 +39,7 @@ public class GroupController {
         }
         return "groups";
     }
+
 
     @GetMapping("/groups/create")
     public String showCreateGroupPage(Model model, Authentication authentication) {
